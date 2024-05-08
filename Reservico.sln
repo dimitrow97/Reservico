@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reservico.Api", "Reservico.Api\Reservico.Api.csproj", "{4B9771CC-4F58-48FD-880E-C752F3B0DC1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reservico.Api", "Reservico.Api\Reservico.Api.csproj", "{4B9771CC-4F58-48FD-880E-C752F3B0DC1A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reservico.Data", "Reservico.Data\Reservico.Data.csproj", "{2E2A6492-EF88-4C30-BD90-9D892A5DAA3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reservico.Identity", "Reservico.Identity\Reservico.Identity.csproj", "{B9DB8CF0-933B-4C23-B0A7-78BE62802280}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reservico.Common", "Reservico.Common\Reservico.Common.csproj", "{E2BFE88D-74DF-46A9-97BA-ABC5683D5FD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reservico.Mapping", "Reservico.Mapping\Reservico.Mapping.csproj", "{CFDE6B38-C79A-4FBA-8689-00830E55734C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,22 @@ Global
 		{4B9771CC-4F58-48FD-880E-C752F3B0DC1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B9771CC-4F58-48FD-880E-C752F3B0DC1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B9771CC-4F58-48FD-880E-C752F3B0DC1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E2A6492-EF88-4C30-BD90-9D892A5DAA3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E2A6492-EF88-4C30-BD90-9D892A5DAA3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E2A6492-EF88-4C30-BD90-9D892A5DAA3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E2A6492-EF88-4C30-BD90-9D892A5DAA3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9DB8CF0-933B-4C23-B0A7-78BE62802280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9DB8CF0-933B-4C23-B0A7-78BE62802280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9DB8CF0-933B-4C23-B0A7-78BE62802280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9DB8CF0-933B-4C23-B0A7-78BE62802280}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2BFE88D-74DF-46A9-97BA-ABC5683D5FD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2BFE88D-74DF-46A9-97BA-ABC5683D5FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2BFE88D-74DF-46A9-97BA-ABC5683D5FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2BFE88D-74DF-46A9-97BA-ABC5683D5FD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFDE6B38-C79A-4FBA-8689-00830E55734C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFDE6B38-C79A-4FBA-8689-00830E55734C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFDE6B38-C79A-4FBA-8689-00830E55734C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFDE6B38-C79A-4FBA-8689-00830E55734C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
