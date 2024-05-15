@@ -1,5 +1,5 @@
 ﻿using Reservico.Common.Models;
-using Reservico.Data.Entities.Abstraction;
+using Reservico.Data.Entities;
 using Reservico.Data.Interfaces;
 using Reservico.Identity.Code.Models;
 using System.Text;
@@ -7,7 +7,7 @@ using System.Text;
 namespace Reservico.Identity.Code
 {
     public class CodeProvider<TCode> : ICodeProvider<TCode>
-        where TCode : BaseCode, new()
+        where TCode : IdentityAuthorizationCode, new()
     {
         protected readonly IRepository<TCode> repository;
 
@@ -84,6 +84,7 @@ namespace Reservico.Identity.Code
             }
 
             codeEntity.IsUsed = true;
+            codeEntity.UpdatedOn = DateTime.UtcNow;
 
             await repository.UpdateAsync(codeEntity);
         }
@@ -104,6 +105,7 @@ namespace Reservico.Identity.Code
             var extraction = ExtractExpirationAndCodeValues(model.Code);
 
             codeEntity.Code = this.GenerateCode(codeEntity, extraction.CodeValues);
+            codeEntity.UpdatedOn = utcNow;
 
             await repository.UpdateAsync(codeEntity);
 

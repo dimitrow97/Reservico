@@ -50,7 +50,7 @@ namespace Reservico.Identity.UserPasswordManager
                     .Error("No user matches the provided email.");
             }
 
-            if (!user.Data.IsActive)
+            if (user.Data.IsActive.HasValue && !user.Data.IsActive.Value)
             {
                 return ServiceResponse<ValidateUserCredentialsResponseModel>
                     .Error("User is suspended.");

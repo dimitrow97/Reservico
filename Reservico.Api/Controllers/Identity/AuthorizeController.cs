@@ -18,7 +18,6 @@ namespace Reservico.Api.Controllers.Identity
         private readonly IUserManager userManager;
         private readonly ILogger<AuthorizeController> logger;
         private readonly IUserPasswordManager userPasswordManager;
-        private readonly ICodeProvider<IdentityOneTimeCode> oneTimeCodeProvider;
         private readonly ICodeProvider<IdentityAuthorizationCode> authorizationCodeProvider;
         private readonly IIdentityAuthorizationConfigProvider identityAuthorizationConfigProvider;
 
@@ -26,14 +25,12 @@ namespace Reservico.Api.Controllers.Identity
             IUserManager userManager,
             ILogger<AuthorizeController> logger,
             IUserPasswordManager userPasswordManager,
-            ICodeProvider<IdentityOneTimeCode> oneTimeCodeProvider,
             ICodeProvider<IdentityAuthorizationCode> authorizationCodeProvider,
             IIdentityAuthorizationConfigProvider identityAuthorizationConfigProvider)
         {
             this.userManager = userManager;
             this.logger = logger;
             this.userPasswordManager = userPasswordManager;
-            this.oneTimeCodeProvider = oneTimeCodeProvider;
             this.authorizationCodeProvider = authorizationCodeProvider;
             this.identityAuthorizationConfigProvider = identityAuthorizationConfigProvider;
         }

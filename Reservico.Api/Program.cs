@@ -73,9 +73,10 @@ builder.Services.AddCors(options =>
 
 builder.Services
     .AddScoped<IEmailSender, EmailSender>()
-    .AddScoped<IUserManager, UserManager>()
+    .AddScoped<IPasswordHasher, PasswordHasher>()
     .AddScoped<IPasswordGenerator, PassswordGenerator>()
     .AddScoped<IUserPasswordManager, UserPasswordManager>()
+    .AddScoped<IUserManager, UserManager>()
     .AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Services
@@ -142,10 +143,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 
     c.DocInclusionPredicate((name, api) => true);
-
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();

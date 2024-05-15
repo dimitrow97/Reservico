@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Reservico.Data.Entities.Abstraction;
 using Reservico.Data.Interfaces;
 using System.Linq.Expressions;
 
 namespace Reservico.Data
 {
     public class Repository<T> : IRepository<T>
-        where T : BaseEntity
+        where T : class
     {
         private readonly ReservicoDbContext dbContext;
         private readonly DbSet<T> entities;
@@ -29,8 +28,6 @@ namespace Reservico.Data
 
         public async Task AddAsync(T entity, bool saveChanges = true)
         {
-            entity.CreatedOn = DateTime.UtcNow;
-
             await this.entities.AddAsync(entity);
 
             if (saveChanges)
@@ -40,9 +37,7 @@ namespace Reservico.Data
         }
 
         public async Task UpdateAsync(T entity, bool saveChanges = true)
-        {
-            entity.UpdatedOn = DateTime.UtcNow;
-
+        {          
             this.entities.Attach(entity);
             this.dbContext.Entry(entity).State = EntityState.Modified;
 
@@ -97,9 +92,6 @@ namespace Reservico.Data
 
         public async Task DeleteAsync(T entity, bool saveChanges = true)
         {
-            entity.IsDeleted = true;
-            entity.UpdatedOn = DateTime.UtcNow;
-
             this.entities.Remove(entity);
 
             if (saveChanges)

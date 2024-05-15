@@ -1,0 +1,4 @@
+﻿1. Set Reservico.Data as startup project
+2. Set Reservico.Data as Default Project in Package Manager Console
+3. Paste the following and run it:
+Scaffold-DbContext "Data Source=DESKTOP-DAR1FCK\SQLEXPRESS;Initial Catalog=Reservico;trusted_connection=true" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -ContextDir .\ -Context ReservicoDbContext -Force -NoOnConfiguring

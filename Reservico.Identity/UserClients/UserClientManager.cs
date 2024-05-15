@@ -75,6 +75,9 @@ namespace Reservico.Identity.UserClients
                     .Error($"User has no relation to this client.");
             }
 
+            uc.IsDeleted = true;
+            uc.UpdatedOn = DateTime.UtcNow;
+
             await this.userClientRepository.DeleteAsync(uc);
 
             var userClientsCount = await this.userClientRepository.Query()
@@ -141,7 +144,8 @@ namespace Reservico.Identity.UserClients
             }
             
             uc.IsSelected = true;
-            
+            uc.UpdatedOn = DateTime.UtcNow;
+
             await this.userClientRepository.UpdateAsync(uc, false);
             await this.userClientRepository.SaveChangesAsync();
 

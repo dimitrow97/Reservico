@@ -67,6 +67,7 @@ namespace Reservico.Identity.UserManager
                 LastName = model.LastName,
                 PhoneNumber = model.PhoneNumber,
                 SecurityStamp = Guid.NewGuid().ToString("N").ToUpper(),
+                CreatedOn = DateTime.UtcNow
             };
 
             var password = passwordGenerator.GeneratePassword(8);
@@ -124,6 +125,7 @@ namespace Reservico.Identity.UserManager
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.IsActive = model.IsActive;
+            user.UpdatedOn = DateTime.UtcNow;
 
             if (user.PhoneNumber != model.PhoneNumber)
             {
@@ -148,6 +150,8 @@ namespace Reservico.Identity.UserManager
                 return ServiceResponse.Error("User should not be null.");
             }
 
+            user.UpdatedOn = DateTime.UtcNow;
+
             await this.userRepository.UpdateAsync(user);
 
             return ServiceResponse.Success();
@@ -165,6 +169,7 @@ namespace Reservico.Identity.UserManager
             }
 
             user.IsDeleted = true;
+            user.UpdatedOn = DateTime.UtcNow;
 
             await this.userRepository.UpdateAsync(user);
 
@@ -303,7 +308,6 @@ namespace Reservico.Identity.UserManager
                 {
                     user.UserRoles.Add(new UserRole
                     {
-                        Id = Guid.NewGuid(),
                         RoleId = dbRole.Id,
                         UserId = user.Id
                     });
@@ -330,7 +334,6 @@ namespace Reservico.Identity.UserManager
                         user.UserRoles.Add(
                             new UserRole 
                             { 
-                                Id = Guid.NewGuid(),
                                 RoleId = role.Id, 
                                 UserId = user.Id 
                             });
@@ -345,6 +348,7 @@ namespace Reservico.Identity.UserManager
                 .FindAllByConditionAsync(x => x.UserId.Equals(user.Id));
 
             user.IsDeleted = false;
+            user.UpdatedOn = DateTime.UtcNow;
 
             await this.userRepository.UpdateAsync(user);
 
@@ -377,11 +381,12 @@ namespace Reservico.Identity.UserManager
                 user.UserRoles.Add(
                     new UserRole
                     {
-                        Id = Guid.NewGuid(),
                         RoleId = role.Id,
                         UserId = user.Id
                     });
             }
+
+            user.UpdatedOn = DateTime.UtcNow;
 
             await this.userRepository.UpdateAsync(user, false);
 
