@@ -35,5 +35,10 @@ namespace Reservico.Identity.UserManager
 
         Task<ServiceResponse<Client>> GetUserSelectedClient(
             Guid userId);
+
+        Task<ServiceResponse<ListViewModel<UserDetailsViewModel>>> Get(
+            string filter = null,
+            int skip = 0,
+            int take = 10);
     }
 }

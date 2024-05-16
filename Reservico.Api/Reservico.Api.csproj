@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Reservico.Identity\Reservico.Identity.csproj" />
+    <ProjectReference Include="..\Reservico.Services\Reservico.Services.csproj" />
   </ItemGroup>
 
 </Project>

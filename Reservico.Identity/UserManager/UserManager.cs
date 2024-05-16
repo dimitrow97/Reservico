@@ -7,6 +7,8 @@ using Reservico.Data.Interfaces;
 using Reservico.Identity.UserManager.Models;
 using Reservico.Identity.UserPasswordManager;
 using System.Data;
+using System.Linq.Dynamic.Core;
+using System.Text.RegularExpressions;
 
 namespace Reservico.Identity.UserManager
 {
@@ -291,6 +293,85 @@ namespace Reservico.Identity.UserManager
             }
 
             return ServiceResponse<Client>.Success(selectedUserClient.Client);
+        }
+
+        public async Task<ServiceResponse<ListViewModel<UserDetailsViewModel>>> Get(
+            string filter = null,
+            int skip = 0,
+            int take = 10)
+        {
+            var queryable = this.userRepository.Query()
+                .Include(x => x.UserClients)
+                    .ThenInclude(x => x.Client)
+                .Include(x => x.UserRoles)
+                    .ThenInclude(x => x.Role)
+                .Where(x => !x.UserRoles.Any(x => x.Role.NormalizedName.Equals(IdentityRoles.AdminRole)))
+                .Where(x => x.IsDeleted.Equals(false));
+
+            var userVms = await this.GetInner(queryable, filter, skip, take);
+
+            if (!userVms.IsSuccess)
+            {
+                return ServiceResponse<ListViewModel<UserDetailsViewModel>>
+                    .Error(userVms.ErrorMessage);
+            }
+
+            return userVms;
+        }
+
+        private async Task<ServiceResponse<ListViewModel<UserDetailsViewModel>>> GetInner(
+            IQueryable<User> queryable,
+            string filter = null,
+            int skip = 0,
+            int take = 10)
+        {
+
+            //filtering
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                filter = RenameQueryFields(filter);
+
+                queryable = queryable.Where(filter);
+            }
+
+            var totalCount = await queryable.CountAsync();
+
+            //paging
+            queryable = queryable.Skip(skip).Take(take);
+
+            var users = await queryable
+                .OrderBy(x => x.Email)
+                .ToListAsync();
+
+            var result = users.Select(user => mapper.Map(user, new UserDetailsViewModel()));
+
+            return ServiceResponse<ListViewModel<UserDetailsViewModel>>.Success(
+                new ListViewModel<UserDetailsViewModel>
+                {
+                    TotalCount = totalCount,
+                    Data = result
+                });
+        }
+
+        private string RenameQueryFields(string query)
+        {
+            var result = query.ToLower()
+               .Replace("id", "Id")
+               .Replace("email", "Email")
+               .Replace("username", "UserName")
+               .Replace("name", "string.Concat(FirstName, LastName)");
+
+            var rgx = new Regex("client.contains\\((.+)\\)");
+
+            if (rgx.IsMatch(result))
+            {
+                var match = rgx.Match(result);
+                match.Groups.TryGetValue("1", out var clientNameFilter);
+
+                result = rgx.Replace(result, $"UserClients.Any(y => y.Client.Name.Contains({clientNameFilter.Value}))");
+            }
+
+            return result;
         }
 
         private async Task HandleRolesOnUpdate(

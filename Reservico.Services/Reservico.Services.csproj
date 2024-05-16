@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reservico.Common\Reservico.Common.csproj" />
+    <ProjectReference Include="..\Reservico.Data\Reservico.Data.csproj" />
+    <ProjectReference Include="..\Reservico.Identity\Reservico.Identity.csproj" />
+  </ItemGroup>
+
+</Project>

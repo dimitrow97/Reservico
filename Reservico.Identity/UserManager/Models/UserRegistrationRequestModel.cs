@@ -14,9 +14,6 @@ namespace Reservico.Identity.UserManager.Models
         [Required]
         public string LastName { get; set; }
 
-        [Required]
-        public string Salutation { get; set; }
-
         public Guid? ClientId { get; set; }
 
         [Required]

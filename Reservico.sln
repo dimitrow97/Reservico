@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reservico.Common", "Reservi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reservico.Mapping", "Reservico.Mapping\Reservico.Mapping.csproj", "{CFDE6B38-C79A-4FBA-8689-00830E55734C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reservico.Migrator", "Reservico.Migrator\Reservico.Migrator.csproj", "{441F37CE-2A8B-4EBA-BE49-18FD1945918D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reservico.Migrator", "Reservico.Migrator\Reservico.Migrator.csproj", "{441F37CE-2A8B-4EBA-BE49-18FD1945918D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reservico.Services", "Reservico.Services\Reservico.Services.csproj", "{AE6A190E-46B6-4BE7-AD9E-FC32C14586B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{441F37CE-2A8B-4EBA-BE49-18FD1945918D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{441F37CE-2A8B-4EBA-BE49-18FD1945918D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{441F37CE-2A8B-4EBA-BE49-18FD1945918D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE6A190E-46B6-4BE7-AD9E-FC32C14586B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE6A190E-46B6-4BE7-AD9E-FC32C14586B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE6A190E-46B6-4BE7-AD9E-FC32C14586B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE6A190E-46B6-4BE7-AD9E-FC32C14586B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
