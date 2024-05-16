@@ -21,7 +21,10 @@ namespace Reservico.Data
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<IdentityAuthorizationCode> IdentityAuthorizationCodes { get; set; }
         public virtual DbSet<IdentityToken> IdentityTokens { get; set; }
+        public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<Reservation> Reservations { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<Table> Tables { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserClient> UserClients { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -108,6 +111,57 @@ namespace Reservico.Data
                 entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             });
 
+            modelBuilder.Entity<Location>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+
+                entity.Property(e => e.Address)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.City)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.Country).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.Postcode).HasMaxLength(256);
+
+                entity.HasOne(d => d.Client)
+                    .WithMany(p => p.Locations)
+                    .HasForeignKey(d => d.ClientId)
+                    .HasConstraintName("FK_Location_ClientId");
+            });
+
+            modelBuilder.Entity<Reservation>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(e => e.LastName)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.HasOne(d => d.Location)
+                    .WithMany(p => p.Reservations)
+                    .HasForeignKey(d => d.LocationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Reservation_LocationId");
+
+                entity.HasOne(d => d.Table)
+                    .WithMany(p => p.Reservations)
+                    .HasForeignKey(d => d.TableId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Reservation_TableId");
+            });
+
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.HasIndex(e => e.NormalizedName, "RoleNameIndex")
@@ -119,6 +173,23 @@ namespace Reservico.Data
                 entity.Property(e => e.Name).HasMaxLength(256);
 
                 entity.Property(e => e.NormalizedName).HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<Table>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.HasOne(d => d.Location)
+                    .WithMany(p => p.Tables)
+                    .HasForeignKey(d => d.LocationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Table_LocationId");
             });
 
             modelBuilder.Entity<User>(entity =>

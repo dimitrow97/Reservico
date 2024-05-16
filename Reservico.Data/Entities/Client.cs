@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Reservico.Data.Entities
+﻿namespace Reservico.Data.Entities
 {
     public partial class Client
     {
         public Client()
         {
+            Locations = new HashSet<Location>();
             UserClients = new HashSet<UserClient>();
         }
 
@@ -20,6 +18,7 @@ namespace Reservico.Data.Entities
         public DateTime UpdatedOn { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual ICollection<Location> Locations { get; set; }
         public virtual ICollection<UserClient> UserClients { get; set; }
     }
 }
