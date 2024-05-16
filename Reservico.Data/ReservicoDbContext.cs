@@ -91,7 +91,7 @@ namespace Reservico.Data
 
             modelBuilder.Entity<IdentityAuthorizationCode>(entity =>
             {
-                entity.HasNoKey();
+                entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
 
                 entity.Property(e => e.ClientId)
                     .IsRequired()
@@ -101,23 +101,11 @@ namespace Reservico.Data
                 entity.Property(e => e.Code)
                     .IsRequired()
                     .HasMaxLength(456);
-
-                entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             });
 
             modelBuilder.Entity<IdentityToken>(entity =>
             {
-                entity.HasNoKey();
-
-                entity.Property(e => e.AccessToken)
-                    .IsRequired()
-                    .HasMaxLength(450);
-
                 entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
-
-                entity.Property(e => e.RefreshToken)
-                    .IsRequired()
-                    .HasMaxLength(450);
             });
 
             modelBuilder.Entity<Role>(entity =>

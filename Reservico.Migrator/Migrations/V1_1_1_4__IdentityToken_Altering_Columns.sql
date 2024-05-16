@@ -1,0 +1,9 @@
+﻿BEGIN TRANSACTION;
+
+ALTER TABLE [IdentityTokens]
+ALTER COLUMN AccessToken NVARCHAR(max);
+
+ALTER TABLE [IdentityTokens]
+ALTER COLUMN RefreshToken NVARCHAR(max);
+
+COMMIT;
