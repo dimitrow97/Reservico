@@ -1,0 +1,6 @@
+﻿BEGIN TRANSACTION;
+
+ALTER TABLE [Reservations]
+ADD [Email] nvarchar(256) NOT NULL;
+
+COMMIT;

@@ -18,6 +18,10 @@ namespace Reservico.Data.Entities
         public DateTime UpdatedOn { get; set; }
         public bool IsDeleted { get; set; }
         public Guid LocationId { get; set; }
+        public int WorkingHoursFrom { get; set; }
+        public int WorkingHoursTo { get; set; }
+        public bool CanTableTurn { get; set; }
+        public int TableTurnOffset { get; set; }
 
         public virtual Location Location { get; set; }
         public virtual ICollection<Reservation> Reservations { get; set; }

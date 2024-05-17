@@ -1,0 +1,6 @@
+﻿BEGIN TRANSACTION;
+
+ALTER TABLE [Tables]
+ADD TableTurnOffset int NOT NULL DEFAULT 0;
+
+COMMIT;

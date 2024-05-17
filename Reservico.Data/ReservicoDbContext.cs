@@ -141,6 +141,10 @@ namespace Reservico.Data
             {
                 entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
 
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
                 entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasMaxLength(256);
@@ -149,11 +153,7 @@ namespace Reservico.Data
                     .IsRequired()
                     .HasMaxLength(256);
 
-                entity.HasOne(d => d.Location)
-                    .WithMany(p => p.Reservations)
-                    .HasForeignKey(d => d.LocationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Reservation_LocationId");
+                entity.Property(e => e.PhoneNumber).IsRequired();
 
                 entity.HasOne(d => d.Table)
                     .WithMany(p => p.Reservations)

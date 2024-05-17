@@ -17,12 +17,17 @@ namespace Reservico.Services.Clients
             this.clientRepository = clientRepository;
         }
 
-        public async Task<ServiceResponse<bool>> ClientExists(Guid clientId)
+        public async Task<ServiceResponse> ClientExists(Guid clientId)
         {
             var result = await clientRepository.Query()
                 .Where(c => !c.IsDeleted).AnyAsync(x => x.Id == clientId);
 
-            return ServiceResponse<bool>.Success(result);
+            if (result == false)
+            {
+                return ServiceResponse.Error("Client does NOT exist");
+            }
+
+            return ServiceResponse.Success();
         }
 
         public async Task<ServiceResponse<Guid>> CreateClient(CreateClientRequestModel model, string userId)

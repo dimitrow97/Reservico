@@ -7,7 +7,6 @@ namespace Reservico.Data.Entities
     {
         public Location()
         {
-            Reservations = new HashSet<Reservation>();
             Tables = new HashSet<Table>();
         }
 
@@ -23,7 +22,6 @@ namespace Reservico.Data.Entities
         public Guid ClientId { get; set; }
 
         public virtual Client Client { get; set; }
-        public virtual ICollection<Reservation> Reservations { get; set; }
         public virtual ICollection<Table> Tables { get; set; }
     }
 }

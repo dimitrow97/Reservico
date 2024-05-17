@@ -11,7 +11,7 @@ namespace Reservico.Services.Clients
     {
         Task<ServiceResponse<Guid>> CreateClient(CreateClientRequestModel model, string userId);
 
-        Task<ServiceResponse<bool>> ClientExists(Guid clientId);
+        Task<ServiceResponse> ClientExists(Guid clientId);
 
         Task<ServiceResponse> UpdateClient(UpdateClientRequestModel model, string userId);
 

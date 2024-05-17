@@ -113,7 +113,7 @@ namespace Reservico.Api.Controllers.Administration
                 }
 
                 var clientExists = await clientService.ClientExists(model.ClientId.Value);
-                if (!clientExists.IsSuccess || !clientExists.Data)
+                if (!clientExists.IsSuccess)
                 {
                     return BadRequest("Invalid Client Provided.");
                 }

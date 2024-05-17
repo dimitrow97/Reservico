@@ -14,10 +14,11 @@ namespace Reservico.Data.Entities
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
         public bool IsDeleted { get; set; }
-        public Guid LocationId { get; set; }
         public Guid TableId { get; set; }
+        public string PhoneNumber { get; set; }
+        public bool IsConfirmed { get; set; }
+        public string Email { get; set; }
 
-        public virtual Location Location { get; set; }
         public virtual Table Table { get; set; }
     }
 }

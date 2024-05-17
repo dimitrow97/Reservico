@@ -1,0 +1,6 @@
+﻿BEGIN TRANSACTION;
+
+ALTER TABLE [Reservations]
+ADD PhoneNumber NVARCHAR(max) NOT NULL;
+
+COMMIT;

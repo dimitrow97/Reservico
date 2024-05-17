@@ -1,4 +1,7 @@
-﻿namespace Reservico.Data.Entities
+﻿using System;
+using System.Collections.Generic;
+
+namespace Reservico.Data.Entities
 {
     public partial class Client
     {
