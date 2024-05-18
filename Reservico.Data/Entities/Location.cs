@@ -20,6 +20,7 @@ namespace Reservico.Data.Entities
         public DateTime UpdatedOn { get; set; }
         public bool IsDeleted { get; set; }
         public Guid ClientId { get; set; }
+        public string Email { get; set; }
 
         public virtual Client Client { get; set; }
         public virtual ICollection<Table> Tables { get; set; }

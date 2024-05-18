@@ -20,8 +20,6 @@ namespace Reservico.Identity.UserManager.Models
 
         public bool IsUsingDefaultPassword { get; set; }
 
-        public bool IsUsingOldPassword { get; set; }
-
         public IEnumerable<string> Roles { get; set; }
 
         public void CreateMappings(IProfileExpression configuration)

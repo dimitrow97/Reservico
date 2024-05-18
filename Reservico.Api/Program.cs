@@ -16,6 +16,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Reservico.Mapping;
 using Reservico.Api.Serialization;
+using Reservico.Services.Clients;
+using Reservico.Services.Reservations;
+using Reservico.Services.Locations;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("reservicoDbConnection")
@@ -83,6 +86,9 @@ builder.Services
     .AddTransient<IUserClientManager, UserClientManager>()
     .AddTransient<ITokenProvider, TokenProvider>()
     .AddTransient<IOtpProvider, OtpProvider>()
+    .AddTransient<IClientService, ClientService>()
+    .AddTransient<ILocationService, LocationService>()
+    .AddTransient<IReservationService, ReservationService>()
     .AddTransient<IIdentityAuthorizationConfigProvider, IdentityAuthorizationConfigProvider>()
     .AddTransient(typeof(ICodeProvider<>), typeof(CodeProvider<>));
 

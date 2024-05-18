@@ -5,7 +5,6 @@ using Reservico.Data.Entities;
 using Reservico.Data.Interfaces;
 using Reservico.Services.Clients;
 using Reservico.Services.Locations.Models;
-using System.Collections.Generic;
 
 namespace Reservico.Services.Locations
 {
@@ -15,17 +14,20 @@ namespace Reservico.Services.Locations
         private readonly IClientService clientService;
         private readonly IRepository<Table> tableRepository;
         private readonly IRepository<Location> locationRepository;
+        private readonly IRepository<Reservation> reservationRepository;
 
         public LocationService(
             IMapper mapper,
             IClientService clientService,
             IRepository<Table> tableRepository,
-            IRepository<Location> locationRepository)
+            IRepository<Location> locationRepository,
+            IRepository<Reservation> reservationRepository)
         {
             this.mapper = mapper;
             this.clientService = clientService;
             this.tableRepository = tableRepository;
             this.locationRepository = locationRepository;
+            this.reservationRepository = reservationRepository;
         }
 
         public async Task<ServiceResponse> Create(CreateLocationRequestModel model)
@@ -51,6 +53,7 @@ namespace Reservico.Services.Locations
             var location = new Location
             {
                 Name = model.Name,
+                Email = model.Email,
                 Address = model.Address,
                 City = model.City,
                 Postcode = model.Postcode,
@@ -77,7 +80,7 @@ namespace Reservico.Services.Locations
             return ServiceResponse.Success();
         }
 
-        public async Task<ServiceResponse<LocationViewModel>> Get(Guid locationId)
+        public async Task<ServiceResponse<LocationDetailsViewModel>> Get(Guid locationId)
         {
             var location = await this.locationRepository.Query()
                 .Include(x => x.Client)
@@ -85,13 +88,44 @@ namespace Reservico.Services.Locations
 
             if (location is null)
             {
-                return ServiceResponse<LocationViewModel>.
+                return ServiceResponse<LocationDetailsViewModel>.
                     Error("Location does NOT exists");
             }
 
-            var result = this.mapper.Map(location, new LocationViewModel());
+            var result = this.mapper.Map(location, new LocationDetailsViewModel());
 
-            return ServiceResponse<LocationViewModel>.Success(result);
+            var tables = await this.GetLocationTables(location.Id);
+
+            result.Tables = tables.IsSuccess ? tables.Data : new List<Table>();
+            result.LastFiveReservations = await this.GetLastFiveReservations(location.Id);
+
+            return ServiceResponse<LocationDetailsViewModel>.Success(result);
+        }
+
+        public async Task<ServiceResponse<IEnumerable<LocationViewModel>>> GetLocations(
+            Guid clientId)
+        {
+            var clientExists = await this.clientService.ClientExists(clientId);
+
+            if (!clientExists.IsSuccess)
+            {
+                return ServiceResponse<IEnumerable<LocationViewModel>>
+                    .Error(clientExists.ErrorMessage);
+            }
+
+            var locations = await this.locationRepository.Query()
+                .Include(x => x.Client)
+                .Where(x => x.ClientId.Equals(clientId) && !x.IsDeleted)
+                .ToListAsync();
+
+            if (locations is null)
+            {
+                return ServiceResponse<IEnumerable<LocationViewModel>>
+                    .Error("No Locations for the provided ClientId");
+            }
+
+            return ServiceResponse<IEnumerable<LocationViewModel>>
+                .Success(locations.Select(x => this.mapper.Map(x, new LocationViewModel())));
         }
 
         public async Task<ServiceResponse<IEnumerable<Table>>> GetLocationTables(
@@ -128,6 +162,7 @@ namespace Reservico.Services.Locations
             var location = await this.locationRepository.GetByIdAsync(model.LocationId);
 
             location.Name = model.Name;
+            location.Email = model.Email;
             location.Address = model.Address;
             location.City = model.City;
             location.Postcode = model.Postcode;
@@ -244,6 +279,19 @@ namespace Reservico.Services.Locations
             await this.tableRepository.UpdateAsync(table);
 
             return ServiceResponse.Success();
+        }
+
+        private async Task<IEnumerable<Reservation>> GetLastFiveReservations(
+            Guid locationId)
+        {
+            var lastFiveReservations = await this.reservationRepository
+                .Query()
+                .Include(x => x.Table)
+                .Where(x => x.Table.LocationId.Equals(locationId))
+                .Take(5)
+                .ToListAsync();
+
+            return lastFiveReservations;
         }
     }
 }

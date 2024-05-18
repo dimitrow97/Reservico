@@ -78,7 +78,7 @@ namespace Reservico.Identity.UserManager
 
             user.PasswordHash = hashedPassword;
 
-            await this.userRepository.AddAsync(user, false);
+            await this.userRepository.AddAsync(user);
 
             var addingToRolesResult = await this.AddUserToRoles(user, model.Roles);
 
@@ -98,7 +98,7 @@ namespace Reservico.Identity.UserManager
                     CreatedOn = DateTime.UtcNow,
                 };
 
-                await userClientRepository.AddAsync(userClient, false);
+                user.UserClients.Add(userClient);
             }
 
             await this.userRepository.SaveChangesAsync();
@@ -182,7 +182,12 @@ namespace Reservico.Identity.UserManager
             where TModel : class, new()
         {
             var user = await this.userRepository
-                .FindByConditionAsync(x => x.Id.Equals(userId));
+                .Query()
+                .Include(x => x.UserRoles)
+                    .ThenInclude(x => x.Role)
+                .Include(x => x.UserClients)
+                    .ThenInclude(x => x.Client)
+                .FirstOrDefaultAsync(x => x.Id.Equals(userId));
 
             if (user == null)
             {

@@ -125,6 +125,10 @@ namespace Reservico.Data
 
                 entity.Property(e => e.Country).HasMaxLength(256);
 
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(256);

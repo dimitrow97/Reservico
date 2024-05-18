@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using Reservico.Identity.UserManager;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Reservico.Api.Controllers.Client
 {

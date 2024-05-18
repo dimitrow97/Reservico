@@ -1,0 +1,6 @@
+﻿BEGIN TRANSACTION;
+
+ALTER TABLE [Locations]
+ADD [Email] nvarchar(256) NOT NULL;
+
+COMMIT;

@@ -1,4 +1,6 @@
-﻿namespace Reservico.Services.Locations.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Reservico.Services.Locations.Models
 {
     public class UpdateLocationRequestModel
     {
@@ -7,6 +9,8 @@
         public string Name { get; set; }
 
         public string Address { get; set; }
+
+        public string Email { get; set; }
 
         public string City { get; set; }
 

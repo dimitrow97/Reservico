@@ -13,6 +13,9 @@ namespace Reservico.Services.Locations.Models
         [Required]
         public string City { get; set; }
 
+        [Required]
+        public string Email { get; set; }
+
         public string Postcode { get; set; }
 
         public string Country { get; set; }

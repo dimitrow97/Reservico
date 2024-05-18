@@ -8,7 +8,9 @@ namespace Reservico.Services.Locations
     {
         Task<ServiceResponse> Create(CreateLocationRequestModel model);
 
-        Task<ServiceResponse<LocationViewModel>> Get(Guid locationId);
+        Task<ServiceResponse<LocationDetailsViewModel>> Get(Guid locationId);
+
+        Task<ServiceResponse<IEnumerable<LocationViewModel>>> GetLocations(Guid clientId);
 
         Task<ServiceResponse<IEnumerable<Table>>> GetLocationTables(Guid locationId);
 

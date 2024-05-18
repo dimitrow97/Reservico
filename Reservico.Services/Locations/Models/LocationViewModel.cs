@@ -8,6 +8,7 @@ namespace Reservico.Services.Locations.Models
     {
         public Guid LocationId { get; set; }
         public string Name { get; set; }
+        public string Email { get; set; }
         public string Address { get; set; }
         public string City { get; set; }
         public string Postcode { get; set; }
@@ -19,6 +20,7 @@ namespace Reservico.Services.Locations.Models
             configuration.CreateMap<Location, LocationViewModel>()
                 .ForMember(x => x.LocationId, cfg => cfg.MapFrom(y => y.Id))
                 .ForMember(x => x.Name, cfg => cfg.MapFrom(y => y.Name))
+                .ForMember(x => x.Email, cfg => cfg.MapFrom(y => y.Email))
                 .ForMember(x => x.Address, cfg => cfg.MapFrom(y => y.Address))
                 .ForMember(x => x.City, cfg => cfg.MapFrom(y => y.City))
                 .ForMember(x => x.Postcode, cfg => cfg.MapFrom(y => y.Postcode))
