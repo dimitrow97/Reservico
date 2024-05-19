@@ -7,7 +7,7 @@ namespace Reservico.Identity.Token
     {
         Task<ServiceResponse<GenerateTokenResponseModel>> GenerateTokenAsync(
             string clientId,
-            Guid userId,
+            Guid? userId = null,
             bool isUserAdmin = false);
 
         Task<ServiceResponse<ValidateTokenResponse>> ValidateTokenAsync(
@@ -17,7 +17,7 @@ namespace Reservico.Identity.Token
         Task<ServiceResponse<RefreshAccessTokenResponseModel>> RefreshAccessTokenAsync(
             string refreshToken,
             string clientId,
-            Guid userId,
+            Guid? userId = null,
             bool isUserAdmin = false);
     }
 }

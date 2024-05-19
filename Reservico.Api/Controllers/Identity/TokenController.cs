@@ -113,7 +113,52 @@ namespace Reservico.Api.Controllers.Identity
 
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
-        }        
+        }
+
+        /// <summary>
+        /// Generates Authentication Tokens for a server-side authentication flow.
+        /// </summary>
+        /// <param name="model">Token Request Model.</param>
+        /// <returns>Authentication Tokens.</returns>
+        [HttpPost]
+        public async Task<IActionResult> Get(TokenGetRequestModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return this.BadRequest(ModelState.Values.Select(x => x.Errors));
+            }
+
+            if (!model.GrantType.Equals(IdentityAuthorizationGrantTypes.ClientCredentials))
+            {
+                return this.BadRequest("Invalid grant type.");
+            }
+
+            var validationResult = this.identityAuthorizationConfigProvider.ValidateClientCredentials(
+                model.ClientId, model.ClientSecret);            
+
+            try
+            {
+                var result = await this.tokenProvider.GenerateTokenAsync(
+                    model.ClientId);
+
+                if (!result.IsSuccess)
+                {
+                    return this.BadRequest(result.ErrorMessage);
+                }
+
+                return this.Ok(new TokenGetResponseModel(
+                    result.Data.AccessToken,
+                    result.Data.RefreshToken,
+                    result.Data.AccessTokenExpirationDate));
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, ex.Message);
+
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
 
         /// <summary>
         /// Generates Authentication Tokens based on a provided refresh token.

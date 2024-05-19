@@ -32,7 +32,7 @@ namespace Reservico.Identity.Token
 
         public async Task<ServiceResponse<GenerateTokenResponseModel>> GenerateTokenAsync(
             string clientId,
-            Guid userId,
+            Guid? userId = null,
             bool isUserAdmin = false)
         {
             var utcNow = DateTime.UtcNow;
@@ -56,10 +56,15 @@ namespace Reservico.Identity.Token
                     refreshTokenExpirationMinutes)
             };
 
+            if (userId.HasValue)
+            {
+                token.TokenType = (int)TokenType.Base;
+            }
+
             var roles = await this.GetUserRoles(userId);           
 
             token.AccessToken = this.GenerateToken(
-                userId.ToString(),
+                userId?.ToString(),
                 identityAuthorizationConfig.TokenSalt,
                 clientId,
                 identityAuthorizationConfig.TokenIssuer,
@@ -143,7 +148,7 @@ namespace Reservico.Identity.Token
         public async Task<ServiceResponse<RefreshAccessTokenResponseModel>> RefreshAccessTokenAsync(
             string refreshToken,
             string clientId,
-            Guid userId,
+            Guid? userId = null,
             bool isUserAdmin = false)
         {
             var tokenEntity = await repository
@@ -221,9 +226,14 @@ namespace Reservico.Identity.Token
             return handler.WriteToken(token);
         }
 
-        private async Task<IList<string>> GetUserRoles(Guid userId)
+        private async Task<IList<string>> GetUserRoles(Guid? userId)
         { 
-            var result = await userManager.GetUserRoles(userId);
+            if (!userId.HasValue)
+            {
+                return null;
+            }
+
+            var result = await userManager.GetUserRoles(userId.Value);
 
             if (result.IsSuccess)
             {
