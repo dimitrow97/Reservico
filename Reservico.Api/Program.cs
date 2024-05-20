@@ -19,6 +19,7 @@ using Reservico.Api.Serialization;
 using Reservico.Services.Clients;
 using Reservico.Services.Reservations;
 using Reservico.Services.Locations;
+using Reservico.Services.Categories;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("reservicoDbConnection")
@@ -89,6 +90,7 @@ builder.Services
     .AddTransient<IClientService, ClientService>()
     .AddTransient<ILocationService, LocationService>()
     .AddTransient<IReservationService, ReservationService>()
+    .AddTransient<ICategoryService, CategoryService>()
     .AddTransient<IIdentityAuthorizationConfigProvider, IdentityAuthorizationConfigProvider>()
     .AddTransient(typeof(ICodeProvider<>), typeof(CodeProvider<>));
 
