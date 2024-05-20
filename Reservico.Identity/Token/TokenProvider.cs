@@ -72,6 +72,14 @@ namespace Reservico.Identity.Token
                 utcNow,
                 roles);
 
+            token.RefreshToken = this.GenerateToken(
+                userId?.ToString(),
+                identityAuthorizationConfig.TokenSalt,
+                clientId,
+                identityAuthorizationConfig.TokenIssuer,
+                token.RefreshTokenExpirationDate,
+                utcNow);
+
             await repository.AddAsync(token);
 
             return ServiceResponse<GenerateTokenResponseModel>.Success(new GenerateTokenResponseModel
