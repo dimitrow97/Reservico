@@ -22,5 +22,7 @@ namespace Reservico.Services.Locations.Models
 
         [Required]
         public Guid ClientId { get; set; }
+
+        public IEnumerable<Guid> Categories { get; set; }
     }
 }

@@ -65,8 +65,8 @@ namespace Reservico.Api.Controllers.Administration
         /// <param name="model">Client model to Update.</param>
         /// <returns>Status code indicating Success or Failure.</returns>
         [HttpPut]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateClient(UpdateClientRequestModel model)
         {
@@ -83,10 +83,10 @@ namespace Reservico.Api.Controllers.Administration
 
                 if (!response.IsSuccess)
                 {
-                    return BadRequest(response.ErrorMessage);
+                    return BadRequest(response);
                 }
 
-                return Ok();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -101,8 +101,8 @@ namespace Reservico.Api.Controllers.Administration
         /// <param name="clientId">Id of the client to delete.</param>
         /// <returns>Status code indicating Success or Failure.</returns>
         [HttpDelete]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteClient(Guid clientId)
         {
@@ -114,10 +114,10 @@ namespace Reservico.Api.Controllers.Administration
 
                 if (!response.IsSuccess)
                 {
-                    return BadRequest(response.ErrorMessage);
+                    return BadRequest(response);
                 }
 
-                return Ok();
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -132,7 +132,7 @@ namespace Reservico.Api.Controllers.Administration
         /// <returns>List of all Clients.</returns>
         [HttpGet]
         [ProducesResponseType(typeof(ServiceResponse<IEnumerable<ClientViewModel>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllClients()
         {
@@ -142,7 +142,7 @@ namespace Reservico.Api.Controllers.Administration
 
                 if (!response.IsSuccess)
                 {
-                    return BadRequest(response.ErrorMessage);
+                    return BadRequest(response);
                 }
 
                 return Ok(response);
@@ -161,7 +161,7 @@ namespace Reservico.Api.Controllers.Administration
         /// <returns>Detailed model of specific Client.</returns>
         [HttpGet("{clientId}")]
         [ProducesResponseType(typeof(ServiceResponse<ClientDetailsViewModel>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetClient(Guid clientId)
         {
@@ -171,7 +171,7 @@ namespace Reservico.Api.Controllers.Administration
 
                 if (!response.IsSuccess)
                 {
-                    return BadRequest(response.ErrorMessage);
+                    return BadRequest(response);
                 }
 
                 return Ok(response);
@@ -190,7 +190,7 @@ namespace Reservico.Api.Controllers.Administration
         /// <returns>Client's name.</returns>
         [HttpGet("GetName/{clientId}")]
         [ProducesResponseType(typeof(ServiceResponse<string>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetClientName(Guid clientId)
         {
@@ -200,7 +200,7 @@ namespace Reservico.Api.Controllers.Administration
 
                 if (!response.IsSuccess)
                 {
-                    return BadRequest(response.ErrorMessage);
+                    return BadRequest(response);
                 }
 
                 return Ok(response);

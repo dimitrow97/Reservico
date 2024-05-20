@@ -14,6 +14,7 @@ namespace Reservico.Services.Locations.Models
         public string Postcode { get; set; }
         public string Country { get; set; }
         public string ClientName { get; set; }
+        public IEnumerable<Category> Categories { get; set; }
 
         public void CreateMappings(IProfileExpression configuration)
         {
@@ -25,7 +26,8 @@ namespace Reservico.Services.Locations.Models
                 .ForMember(x => x.City, cfg => cfg.MapFrom(y => y.City))
                 .ForMember(x => x.Postcode, cfg => cfg.MapFrom(y => y.Postcode))
                 .ForMember(x => x.Country, cfg => cfg.MapFrom(y => y.Country))
-                .ForMember(x => x.ClientName, cfg => cfg.MapFrom(y => y.Client.Name));
+                .ForMember(x => x.ClientName, cfg => cfg.MapFrom(y => y.Client.Name))
+                .ForMember(x => x.Categories, cfg => cfg.MapFrom(y => y.LocationCategories.Select(z => z.Category)));
         }
     }
 }

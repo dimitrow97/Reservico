@@ -17,11 +17,14 @@ namespace Reservico.Data
         {
         }
 
+        public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Changelog> Changelogs { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<IdentityAuthorizationCode> IdentityAuthorizationCodes { get; set; }
         public virtual DbSet<IdentityToken> IdentityTokens { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<LocationCategory> LocationCategories { get; set; }
+        public virtual DbSet<LocationImage> LocationImages { get; set; }
         public virtual DbSet<Reservation> Reservations { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Table> Tables { get; set; }
@@ -31,6 +34,15 @@ namespace Reservico.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(256);
+            });
+
             modelBuilder.Entity<Changelog>(entity =>
             {
                 entity.ToTable("changelog");
@@ -139,6 +151,33 @@ namespace Reservico.Data
                     .WithMany(p => p.Locations)
                     .HasForeignKey(d => d.ClientId)
                     .HasConstraintName("FK_Location_ClientId");
+            });
+
+            modelBuilder.Entity<LocationCategory>(entity =>
+            {
+                entity.HasKey(e => new { e.LocationId, e.CategoryId });
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.LocationCategories)
+                    .HasForeignKey(d => d.CategoryId);
+
+                entity.HasOne(d => d.Location)
+                    .WithMany(p => p.LocationCategories)
+                    .HasForeignKey(d => d.LocationId);
+            });
+
+            modelBuilder.Entity<LocationImage>(entity =>
+            {
+                entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+
+                entity.Property(e => e.BlobName).IsRequired();
+
+                entity.Property(e => e.BlobPath).IsRequired();
+
+                entity.HasOne(d => d.Location)
+                    .WithMany(p => p.LocationImages)
+                    .HasForeignKey(d => d.LocationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<Reservation>(entity =>

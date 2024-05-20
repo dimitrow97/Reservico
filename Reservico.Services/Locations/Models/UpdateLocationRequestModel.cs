@@ -17,5 +17,7 @@ namespace Reservico.Services.Locations.Models
         public string Postcode { get; set; }
 
         public string Country { get; set; }
+
+        public IList<Guid> Categories { get; set; }
     }
 }

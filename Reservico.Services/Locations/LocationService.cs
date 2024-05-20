@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Reservico.Common.Models;
 using Reservico.Data.Entities;
 using Reservico.Data.Interfaces;
+using Reservico.Services.Categories;
 using Reservico.Services.Clients;
 using Reservico.Services.Locations.Models;
 
@@ -12,6 +13,7 @@ namespace Reservico.Services.Locations
     {
         private readonly IMapper mapper;
         private readonly IClientService clientService;
+        private readonly ICategoryService categoryService;
         private readonly IRepository<Table> tableRepository;
         private readonly IRepository<Location> locationRepository;
         private readonly IRepository<Reservation> reservationRepository;
@@ -19,12 +21,14 @@ namespace Reservico.Services.Locations
         public LocationService(
             IMapper mapper,
             IClientService clientService,
+            ICategoryService categoryService,
             IRepository<Table> tableRepository,
             IRepository<Location> locationRepository,
             IRepository<Reservation> reservationRepository)
         {
             this.mapper = mapper;
             this.clientService = clientService;
+            this.categoryService = categoryService;
             this.tableRepository = tableRepository;
             this.locationRepository = locationRepository;
             this.reservationRepository = reservationRepository;
@@ -64,6 +68,22 @@ namespace Reservico.Services.Locations
 
             await this.locationRepository.AddAsync(location);
 
+            foreach (var category in model.Categories)
+            {
+                var categoryExists = await this.categoryService
+                    .CategoryExists(category);
+
+                var lc = new LocationCategory
+                {
+                    Location = location,
+                    CategoryId = category
+                };
+
+                location.LocationCategories.Add(lc);
+            }
+
+            await this.locationRepository.UpdateAsync(location);
+
             return ServiceResponse.Success();
         }
 
@@ -84,6 +104,8 @@ namespace Reservico.Services.Locations
         {
             var location = await this.locationRepository.Query()
                 .Include(x => x.Client)
+                .Include(x => x.LocationCategories)
+                    .ThenInclude(x => x.Category)
                 .FirstOrDefaultAsync(x => x.Id.Equals(locationId) && !x.IsDeleted);
 
             if (location is null)
@@ -115,6 +137,8 @@ namespace Reservico.Services.Locations
 
             var locations = await this.locationRepository.Query()
                 .Include(x => x.Client)
+                .Include(x => x.LocationCategories)
+                    .ThenInclude(x => x.Category)
                 .Where(x => x.ClientId.Equals(clientId) && !x.IsDeleted)
                 .ToListAsync();
 
@@ -167,6 +191,9 @@ namespace Reservico.Services.Locations
             location.City = model.City;
             location.Postcode = model.Postcode;
             location.Country = model.Country;
+
+            await this.HandleCategoriesOnUpdate(
+                location, model.Categories);
 
             await this.locationRepository.SaveChangesAsync();
 
@@ -292,6 +319,56 @@ namespace Reservico.Services.Locations
                 .ToListAsync();
 
             return lastFiveReservations;
+        }
+
+        private async Task HandleCategoriesOnUpdate(
+            Location location,
+            IList<Guid> categories)
+        {
+            var categoriesAll = await this.categoryService
+                .GetAll();
+
+            var categoriesInDb = categoriesAll.Data
+                .Where(r => categories.Any(x => r.CategoryId.Equals(r)));
+
+            if (location.LocationCategories is null || !location.LocationCategories.Any())
+            {
+                foreach (var dbCategory in categoriesInDb)
+                {
+                    location.LocationCategories.Add(new LocationCategory
+                    {
+                        CategoryId = dbCategory.CategoryId,
+                        LocationId = location.Id
+                    });
+                }
+            }
+            else
+            {
+                foreach (var c in location.LocationCategories)
+                {
+                    if (categories.Any(x => x.Equals(c.CategoryId)))
+                    {
+                        categories.Remove(c.CategoryId);
+                    }
+                    else
+                    {
+                        location.LocationCategories.Remove(c);
+                    }
+                }
+
+                if (categories.Any())
+                {
+                    foreach (var c in categoriesInDb.Where(x => categories.Any(r => x.CategoryId.Equals(r))))
+                    {
+                        location.LocationCategories.Add(
+                            new LocationCategory
+                            {
+                                CategoryId = c.CategoryId,
+                                LocationId = location.Id
+                            });
+                    }
+                }
+            }
         }
     }
 }

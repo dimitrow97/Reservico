@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Reservico.Common.Models;
 using Reservico.Identity.UserManager;
-using Reservico.Identity.UserManager.Models;
-using Reservico.Services.Clients;
 using Reservico.Services.Locations;
 using Reservico.Services.Locations.Models;
 

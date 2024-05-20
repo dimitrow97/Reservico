@@ -7,6 +7,8 @@ namespace Reservico.Data.Entities
     {
         public Location()
         {
+            LocationCategories = new HashSet<LocationCategory>();
+            LocationImages = new HashSet<LocationImage>();
             Tables = new HashSet<Table>();
         }
 
@@ -23,6 +25,8 @@ namespace Reservico.Data.Entities
         public string Email { get; set; }
 
         public virtual Client Client { get; set; }
+        public virtual ICollection<LocationCategory> LocationCategories { get; set; }
+        public virtual ICollection<LocationImage> LocationImages { get; set; }
         public virtual ICollection<Table> Tables { get; set; }
     }
 }
