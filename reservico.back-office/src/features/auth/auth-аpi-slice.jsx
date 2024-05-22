@@ -12,7 +12,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         token: builder.mutation({
             query: params => ({
                 url: '/Token',
-                method: 'Get',
+                method: 'GET',
                 params: { ...params }
             })
         }),
