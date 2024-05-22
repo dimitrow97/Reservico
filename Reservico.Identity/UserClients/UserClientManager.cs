@@ -67,7 +67,9 @@ namespace Reservico.Identity.UserClients
             RemoveUserFromClientRequest request)
         {
             var uc = await this.userClientRepository.FindByConditionAsync(x =>
-                x.UserId.Equals(request.UserId) && x.ClientId.Equals(request.ClientId));
+                !x.IsDeleted &&
+                x.UserId.Equals(request.UserId) && 
+                x.ClientId.Equals(request.ClientId));
 
             if (uc is null)
             {
@@ -78,7 +80,7 @@ namespace Reservico.Identity.UserClients
             uc.IsDeleted = true;
             uc.UpdatedOn = DateTime.UtcNow;
 
-            await this.userClientRepository.DeleteAsync(uc);
+            await this.userClientRepository.UpdateAsync(uc);
 
             var userClientsCount = await this.userClientRepository.Query()
                 .Where(x => x.UserId.Equals(request.UserId))

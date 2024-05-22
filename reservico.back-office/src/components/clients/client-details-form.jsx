@@ -3,6 +3,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import ClientEditDialog from "./client-edit-dialog";
 import ClientDeleteAlertDialog from "./client-delete-alert-dialog"
+import { useSelector } from 'react-redux'
 
 const ClientDetailsForm = (props) => {
     const {
@@ -11,7 +12,7 @@ const ClientDetailsForm = (props) => {
         isError,
         isLoading,
         isSuccess } = useGetClientDetailsQuery(props.id)
-   
+
     let content;
     if (isLoading) {
         content = <p>"Loading..."</p>;
@@ -25,7 +26,7 @@ const ClientDetailsForm = (props) => {
                         </Label>
                         <Input
                             id="id"
-                            defaultValue={data.data.id}
+                            value={data.data.id}
                             className="col-span-10"
                             disabled
                         />
@@ -36,7 +37,7 @@ const ClientDetailsForm = (props) => {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue={data.data.name}
+                            value={data.data.name}
                             className="col-span-10"
                             disabled
                         />
@@ -47,7 +48,7 @@ const ClientDetailsForm = (props) => {
                         </Label>
                         <Input
                             id="address"
-                            defaultValue={data.data.address}
+                            value={data.data.address}
                             className="col-span-10"
                             disabled
                         />
@@ -58,7 +59,7 @@ const ClientDetailsForm = (props) => {
                         </Label>
                         <Input
                             id="city"
-                            defaultValue={data.data.city}
+                            value={data.data.city}
                             className="col-span-10"
                             disabled
                         />
@@ -69,7 +70,7 @@ const ClientDetailsForm = (props) => {
                         </Label>
                         <Input
                             id="postcode"
-                            defaultValue={data.data.postcode}
+                            value={data.data.postcode}
                             className="col-span-10"
                             disabled
                         />
@@ -80,7 +81,7 @@ const ClientDetailsForm = (props) => {
                         </Label>
                         <Input
                             id="country"
-                            defaultValue={data.data.country}
+                            value={data.data.country}
                             className="col-span-10"
                             disabled
                         />

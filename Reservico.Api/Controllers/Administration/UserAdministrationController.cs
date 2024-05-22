@@ -193,17 +193,7 @@ namespace Reservico.Api.Controllers.Administration
                 if (!ucDelete.IsSuccess)
                 {
                     return BadRequest(ucDelete);
-                }
-
-                if (ucDelete.Data.UserClientsCount.Equals(0))
-                {
-                    var response = await userManager.DeleteAsync(new Guid(request.UserId));
-
-                    if (!response.IsSuccess)
-                    {
-                        return BadRequest(response);
-                    }
-                }
+                }                
 
                 return Ok(ServiceResponse.Success());
 

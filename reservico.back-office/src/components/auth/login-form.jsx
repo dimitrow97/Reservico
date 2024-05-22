@@ -38,13 +38,11 @@ const LoginForm = () => {
     },
   });
 
-  useEffect(() => {
-    setErrMsg('') })
-
   const [login] = useLoginMutation()
   const [token] = useTokenMutation()
 
   const onSubmit = async (data) => {
+    setErrMsg('');
     setLoading(true);
 
     const email = data.email
@@ -52,24 +50,27 @@ const LoginForm = () => {
 
     try {
       const auth = await login({ email, password, clientId, grantType }).unwrap()
+      
       const userData = await token({ authorizationCode: auth.authorizationCode }).unwrap()
-      dispatch(setCredentials({ ...userData, email }))      
+
+      dispatch(setCredentials({ ...userData, email }))
       navigate('/home')
     } catch (err) {
       if (!err?.originalStatus) {
         // isLoading: true until timeout occurs
-        setErrMsg('No Server Response');
+        setErrMsg('Oops.. Something went wrong! Please try again later.');
       } else if (err.originalStatus === 400) {
-        setErrMsg('Missing Username or Password');
+        setErrMsg('Wrong Credentials!');
       } else if (err.originalStatus === 401) {
         setErrMsg('Unauthorized');
       } else {
-        setErrMsg('Login Failed');
+        setErrMsg('Login ttemp failed..');
       }
       errRef.current.focus();
     }
 
-    console.log(data);
+    console.log(errMsg)
+    setLoading(false)
   };
 
   //const { pending } = useFormStatus();
@@ -101,7 +102,7 @@ const LoginForm = () => {
                 </FormItem>
               )}
             />
-            <FormField              
+            <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
@@ -115,7 +116,7 @@ const LoginForm = () => {
               )}
             />
           </div>
-          <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+          <p ref={errRef} className="errmsg text-red-500" aria-live="assertive">{errMsg}</p>
           <Button type="submit" className="w-full" >
             {loading ? "Loading..." : "Login"}
           </Button>

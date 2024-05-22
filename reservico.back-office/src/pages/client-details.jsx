@@ -1,5 +1,6 @@
 import ClientDetailsForm from "../components/clients/client-details-form"
-import {useLocation} from 'react-router-dom';
+import ClientUsers from "../components/clients/client-users";
+import { useLocation } from 'react-router-dom';
 
 import {
     Card,
@@ -9,17 +10,27 @@ import {
 } from "@/components/ui/card"
 
 const ClientDetails = () => {
-    const location = useLocation(); 
+    const location = useLocation();
 
     return (
-        <Card className="w-1/2 h-full">
-            <CardHeader>
-                <CardTitle>Client Details</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-                <ClientDetailsForm id={location.state.id}/>
-            </CardContent>
-        </Card>
+        <div className="grid grid-cols-2 gap-4">
+            <Card className="h-full">
+                <CardHeader>
+                    <CardTitle>Client Details</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                    <ClientDetailsForm id={location.state.id} />
+                </CardContent>
+            </Card>
+            <Card className="h-full">
+                <CardHeader>
+                    <CardTitle>Client Users</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                    <ClientUsers id={location.state.id} />
+                </CardContent>
+            </Card>
+        </div>
     )
 }
 

@@ -1,5 +1,8 @@
 import * as React from "react"
-import { ClipboardPlus } from "lucide-react"
+import { 
+    ClipboardPlus,
+    CircleX  
+} from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -84,7 +87,7 @@ export function ClientAddDrawer() {
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
-                <Button variant="outline">Create a new Client</Button>
+                <Button variant="outline" className="ml-auto mr- shadow">Create a new Client</Button>
             </DrawerTrigger>
             <DrawerContent>
                 <div className="mx-auto w-full max-w-sm">
@@ -92,8 +95,8 @@ export function ClientAddDrawer() {
                         <DrawerTitle>Create Client</DrawerTitle>
                     </DrawerHeader>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                            <div className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)}>
+                            <div className="space-y-2">
                                 <FormField
                                     control={form.control}
                                     name="name"
@@ -176,17 +179,16 @@ export function ClientAddDrawer() {
                                 />
                             </div>
                             <DrawerFooter>
-                                <div className="flex flex-row justify-start gap-4">
-                                    <Button type="submit" className="w-1/4 p-2" >
+                                    <Button type="submit" className="bg-green-500 hover:bg-green-600">
                                         <ClipboardPlus className="mr-2 h-4 w-4" />
                                         <span>{loading ? "Loading..." : "Create"}</span>
                                     </Button>
                                     <DrawerClose asChild>
-                                        <Button variant="outline" className="w-1/4 p-2">
-                                            Cancel
+                                        <Button variant="outline">
+                                            <CircleX className="mr-2 h-4 w-4" />
+                                            <span>Cancel</span>
                                         </Button>
                                     </DrawerClose>
-                                </div>
                             </DrawerFooter>
                         </form>
                     </Form>

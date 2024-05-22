@@ -30,7 +30,8 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import {Link, useNavigate} from 'react-router-dom';
-import ClientAddDrawer from "./client-add-drawer";
+import { useToast } from "@/components/ui/use-toast"
+import { useRemoveUserFromClientMutation } from "../../features/users/users-api-slice"
 
 export const columns = [
     {
@@ -56,22 +57,22 @@ export const columns = [
         enableHiding: false,
     },
     {
-        accessorKey: "id",
+        accessorKey: "email",
         header: ({ column }) => {
             return (
                 <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    Id
+                    Email
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             )
         },
-        cell: ({ row }) => <div className="lowercase">{row.getValue("id")}</div>,
+        cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
     },
     {
-        accessorKey: "name",
+        accessorKey: "fullName",
         header: ({ column }) => {
             return (
                 <Button
@@ -83,33 +84,42 @@ export const columns = [
                 </Button>
             )
         },
-        cell: ({ row }) => <div>{row.getValue("name")}</div>,
-    },
-    {
-        accessorKey: "dateCreated",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Date Created
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
-        cell: ({ row }) => <div>{row.getValue("dateCreated")}</div>,
-    },
+        cell: ({ row }) => <div>{row.getValue("fullName")}</div>,
+    },    
     {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const client = row.original
+            const user = row.original          
 
-            const navigate = useNavigate();
+            const [removeUser] = useRemoveUserFromClientMutation()
+            const { toast } = useToast()
 
-            const toClientDetails = (id) => {
-                navigate('/client-details', { state: { id: id } })
+            const removeUserFromClient = async ({ userId, clientId }) => {
+
+                const request = {
+                    userId: userId,
+                    clientId: clientId
+                }
+
+                try {
+                    const response = await removeUser(request).unwrap()
+        
+                    if (response.isSuccess) {
+                        toast({
+                            title: "Removed successfully!",
+                            description: "User was successfully removed from the Client!",
+                        })
+                    }
+                    else {
+                        toast({
+                            title: "Removeing the User was unsuccessfull!",
+                            description: response.errorMessage,
+                        })
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
             }            
 
             return (
@@ -123,13 +133,13 @@ export const columns = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(client.id)}
+                            onClick={() => navigator.clipboard.writeText(user.userId)}
                         >
-                            Copy Client Id
+                            Copy User Id
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <a onClick={() => {toClientDetails(client.id)}}>View Client details</a>
+                            <a onClick={() => {removeUserFromClient({ userId: user.userId, clientId: user.clientId })}}>Remove User from Client</a>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -138,7 +148,7 @@ export const columns = [
     },
 ]
 
-const ClientsDataTable = ({ data }) => {
+const ClientUsersDataTable = ({ data }) => {
     const [sorting, setSorting] = React.useState([])
     const [columnFilters, setColumnFilters] = React.useState([])
     const [columnVisibility, setColumnVisibility] =
@@ -168,14 +178,13 @@ const ClientsDataTable = ({ data }) => {
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter names..."
-                    value={(table.getColumn("name")?.getFilterValue()) ?? ""}
+                    placeholder="Filter emails..."
+                    value={(table.getColumn("email")?.getFilterValue()) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("name")?.setFilterValue(event.target.value)
+                        table.getColumn("email")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
-                <ClientAddDrawer />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>                        
                         <Button variant="outline" className="ml-2">
@@ -281,4 +290,4 @@ const ClientsDataTable = ({ data }) => {
     )
 }
 
-export default ClientsDataTable
+export default ClientUsersDataTable

@@ -16,6 +16,8 @@ namespace Reservico.Identity.UserManager.Models
 
         public bool IsUsingDefaultPassword { get; set; }
 
+        public string ClientId { get; set; }
+
         public void CreateMappings(IProfileExpression configuration)
         {
             configuration.CreateMap<User, UserViewModel>()

@@ -56,7 +56,7 @@ namespace Reservico.Identity.Token
                     refreshTokenExpirationMinutes)
             };
 
-            if (userId.HasValue)
+            if (!userId.HasValue)
             {
                 token.TokenType = (int)TokenType.Base;
             }
@@ -191,8 +191,7 @@ namespace Reservico.Identity.Token
             string issuer,
             DateTime expirationDate,
             DateTime createdOn,
-            IList<string> roles = null,
-            string avaloqBp = null)
+            IList<string> roles = null)
         {
             var tokenSaltBytes = Convert.FromBase64String(tokenSalt);
 
@@ -207,7 +206,7 @@ namespace Reservico.Identity.Token
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, clientId),
-                new Claim(JwtRegisteredClaimNames.Jti, jti ?? avaloqBp ?? Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, jti ?? Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Exp, expirationDate.ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, createdOn.ToString())
             };

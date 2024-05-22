@@ -14,6 +14,8 @@ namespace Reservico.Identity.UserManager.Models
 
         public string Email { get; set; }
 
+        public string PhoneNumber { get; set; }
+
         public string ClientName { get; set; }
 
         public string ClientId { get; set; }
@@ -29,6 +31,7 @@ namespace Reservico.Identity.UserManager.Models
                 .ForMember(x => x.FirstName, cfg => cfg.MapFrom(y => y.FirstName))
                 .ForMember(x => x.LastName, cfg => cfg.MapFrom(y => y.LastName))
                 .ForMember(x => x.Email, cfg => cfg.MapFrom(y => y.Email))
+                .ForMember(x => x.PhoneNumber, cfg => cfg.MapFrom(y => y.PhoneNumber))
                 .ForMember(x => x.IsUsingDefaultPassword, cfg => cfg.MapFrom(y => y.IsUsingDefaultPassword));
         }
     }

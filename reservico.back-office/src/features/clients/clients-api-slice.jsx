@@ -8,14 +8,16 @@ export const clientsApiSlice = apiSlice.injectEndpoints({
         }),
         getClientDetails: builder.query({
             query: clientId => '/Admin/ClientAdministration/' + clientId,
-            keepUnusedDataFor: 1,
+            keepUnusedDataFor: 1,            
+            providesTags: ['client-details']
         }),
         updateClient: builder.mutation({
             query: client => ({
                 url: '/Admin/ClientAdministration',
                 method: 'PUT',
-                body: { ...client }
-            })
+                body: { ...client }                
+            }),            
+            invalidatesTags: ['client-details']            
         }),
         deleteClient: builder.mutation({
             query: params => ({

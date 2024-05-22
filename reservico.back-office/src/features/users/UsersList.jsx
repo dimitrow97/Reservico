@@ -1,4 +1,4 @@
-import { useGetUsersQuery } from "./usersApiSlice"
+import { useGetUsersQuery } from "./users-api-slice"
 import { Link } from "react-router-dom";
 
 const UsersList = () => {

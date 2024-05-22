@@ -148,7 +148,8 @@ namespace Reservico.Services.Clients
                     Email = uc.User.Email,
                     FullName = $"{uc.User.FirstName} {uc.User.LastName}",
                     IsActive = uc.User.IsActive ?? false,
-                    IsUsingDefaultPassword = uc.User.IsUsingDefaultPassword ?? false
+                    IsUsingDefaultPassword = uc.User.IsUsingDefaultPassword ?? false,
+                    ClientId = clientId.ToString()
                 });
 
             return ServiceResponse<IEnumerable<UserViewModel>>.Success(users);
