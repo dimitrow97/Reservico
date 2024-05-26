@@ -18,3 +18,33 @@ export const ClientAddSchema = z.object({
     postcode: z.string(),
     country: z.string()
 })
+
+export const CategoryAddSchema = z.object({
+    name: z.string().min(2, {
+        message: "Please enter a valid name"
+    }),
+})
+
+export const UserAddSchema = z.object({
+    email: z.string().email({
+        message: "Please enter a valid email address"
+    }),
+    firstName: z.string().min(2, {
+        message: "Please enter a valid First name"
+    }),
+    lastName: z.string().min(2, {
+        message: "Please enter a valid Last name"
+    }),
+    phoneNumber: z.string().min(10, {
+        message: "Please enter a valid Last name"
+    }),
+    clientId: z.string().min(36, {
+        message: "Please enter a valid Client Id"
+    }),
+})
+
+export const UserAddClientSchema = z.object({
+    clientId: z.string().min(36, {
+        message: "Please enter a valid Client Id"
+    }),
+})

@@ -28,7 +28,7 @@ namespace Reservico.Identity.UserClients
             var user = await this.userRepository.Query()
                 .Where(u => !u.IsDeleted)
                 .Include(u => u.UserClients)
-                .FirstOrDefaultAsync(x => x.Email.Equals(request.UserEmail));
+                .FirstOrDefaultAsync(x => x.Id.Equals(request.UserId));
 
             if (user is null)
             {
@@ -63,6 +63,28 @@ namespace Reservico.Identity.UserClients
             return ServiceResponse.Success();
         }
 
+        public async Task<ServiceResponse> ReactivateUserClient(
+            AddUserToClientRequest request)
+        {
+            var uc = await this.userClientRepository.FindByConditionAsync(x =>
+                x.IsDeleted &&
+                x.UserId.Equals(request.UserId) &&
+                x.ClientId.Equals(request.ClientId));
+
+            if (uc is null)
+            {
+                return ServiceResponse.Error(
+                    "User has no relation to this client.");
+            }
+
+            uc.IsDeleted = false;
+            uc.UpdatedOn = DateTime.UtcNow;
+
+            await this.userClientRepository.UpdateAsync(uc);
+
+            return ServiceResponse.Success();
+        }
+
         public async Task<ServiceResponse<RemoveUserFromClientResponse>> RemoveUserFromClient(
             RemoveUserFromClientRequest request)
         {
@@ -74,7 +96,7 @@ namespace Reservico.Identity.UserClients
             if (uc is null)
             {
                 return ServiceResponse<RemoveUserFromClientResponse>
-                    .Error($"User has no relation to this client.");
+                    .Error("User has no relation to this client.");
             }
 
             uc.IsDeleted = true;
@@ -97,7 +119,7 @@ namespace Reservico.Identity.UserClients
                 .Where(u => !u.IsDeleted)
                 .Include(u => u.UserClients)
                 .ThenInclude(x => x.Client)
-                .FirstOrDefaultAsync(x => x.Id.Equals(userId));
+                .FirstOrDefaultAsync(x => x.Id.ToString().Equals(userId));
 
             if (user is null)
             {
@@ -111,12 +133,15 @@ namespace Reservico.Identity.UserClients
                     .Error($"User is not linked to any clients.");
             }
 
-            var userClients = user.UserClients.Select(
+            var userClients = user.UserClients
+                .Select(
                 x => new UserClientsViewModel
                 {
+                    UserId = x.UserId,
                     ClientId = x.ClientId,
                     ClientName = x.Client.Name,
-                    IsSelected = x.IsSelected
+                    IsSelected = x.IsSelected,
+                    IsDeleted = x.IsDeleted
                 });
 
             return ServiceResponse<IEnumerable<UserClientsViewModel>>

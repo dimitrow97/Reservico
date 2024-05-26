@@ -17,11 +17,14 @@ import { useDeleteClientMutation } from "../../features/clients/clients-api-slic
 import { useToast } from "@/components/ui/use-toast"
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { apiSlice } from "../../app/api/api-slice"
+import { useDispatch } from "react-redux"
 
 export function ClientDeleteAlertDialog(props) {
     const [deleteClient] = useDeleteClientMutation()
     const { toast } = useToast()    
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const [id] = useState(props.props.id)
    
@@ -31,9 +34,8 @@ export function ClientDeleteAlertDialog(props) {
         try {
             const response = await deleteClient({ clientId: id }).unwrap()
 
-            console.log(response)
-
             if (response.isSuccess) {
+                dispatch(apiSlice.util.invalidateTags(["client"]))
                 navigate("/clients")
             }
             else {
@@ -57,7 +59,7 @@ export function ClientDeleteAlertDialog(props) {
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
                         This action can be undone. This will soft-delete
-                        the client and kepp the data on our servers.
+                        the client and keep the data on our servers.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

@@ -30,10 +30,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import {Link, useNavigate} from 'react-router-dom';
-import { useToast } from "@/components/ui/use-toast"
-import { useRemoveUserFromClientMutation } from "../../features/users/users-api-slice"
-import { useDispatch } from "react-redux"
-import { apiSlice } from "../../app/api/api-slice"
+import UserAddDrawer from "./user-add-drawer";
 
 export const columns = [
     {
@@ -59,6 +56,51 @@ export const columns = [
         enableHiding: false,
     },
     {
+        accessorKey: "userId",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Id
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => <div className="lowercase">{row.getValue("userId")}</div>,
+    },
+    {
+        accessorKey: "firstName",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    First Name
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => <div>{row.getValue("firstName")}</div>,
+    },
+    {
+        accessorKey: "lastName",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Last Name
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => <div>{row.getValue("lastName")}</div>,
+    },
+    {
         accessorKey: "email",
         header: ({ column }) => {
             return (
@@ -71,59 +113,18 @@ export const columns = [
                 </Button>
             )
         },
-        cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-    },
-    {
-        accessorKey: "fullName",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Name
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
-        cell: ({ row }) => <div>{row.getValue("fullName")}</div>,
+        cell: ({ row }) => <div>{row.getValue("email")}</div>,
     },    
     {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const user = row.original          
+            const user = row.original
 
-            const [removeUser] = useRemoveUserFromClientMutation()
-            const { toast } = useToast()
-            const dispatch = useDispatch()
+            const navigate = useNavigate();
 
-            const removeUserFromClient = async ({ userId, clientId }) => {
-
-                const request = {
-                    userId: userId,
-                    clientId: clientId
-                }
-
-                try {
-                    const response = await removeUser(request).unwrap()
-        
-                    if (response.isSuccess) {
-                        dispatch(apiSlice.util.invalidateTags(["client-users"]))
-                        toast({
-                            title: "Removed successfully!",
-                            description: "User was successfully removed from the Client!",
-                        })
-                    }
-                    else {
-                        toast({
-                            title: "Removeing the User was unsuccessfull!",
-                            description: response.errorMessage,
-                        })
-                    }
-                } catch (err) {
-                    console.log(err);
-                }
+            const toUserDetails = (userId) => {
+                navigate('/user-details', { state: { userId: userId } })
             }            
 
             return (
@@ -143,7 +144,7 @@ export const columns = [
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <a onClick={() => {removeUserFromClient({ userId: user.userId, clientId: user.clientId })}}>Remove User from Client</a>
+                            <a onClick={() => {toUserDetails(user.userId)}}>View User details</a>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -152,7 +153,7 @@ export const columns = [
     },
 ]
 
-const ClientUsersDataTable = ({ data }) => {
+const UsersDataTable = ({ data }) => {
     const [sorting, setSorting] = React.useState([])
     const [columnFilters, setColumnFilters] = React.useState([])
     const [columnVisibility, setColumnVisibility] =
@@ -182,13 +183,14 @@ const ClientUsersDataTable = ({ data }) => {
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter emails..."
+                    placeholder="Filter email..."
                     value={(table.getColumn("email")?.getFilterValue()) ?? ""}
                     onChange={(event) =>
                         table.getColumn("email")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
+                <UserAddDrawer />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>                        
                         <Button variant="outline" className="ml-2">
@@ -294,4 +296,4 @@ const ClientUsersDataTable = ({ data }) => {
     )
 }
 
-export default ClientUsersDataTable
+export default UsersDataTable

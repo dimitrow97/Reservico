@@ -29,11 +29,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import {Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import CategoryAddDrawer from "./category-add-drawer";
+import { useDeleteCategoryMutation } from "../../features/categories/categories-api-slice"
 import { useToast } from "@/components/ui/use-toast"
-import { useRemoveUserFromClientMutation } from "../../features/users/users-api-slice"
-import { useDispatch } from "react-redux"
 import { apiSlice } from "../../app/api/api-slice"
+import { useDispatch } from "react-redux"
 
 export const columns = [
     {
@@ -59,22 +60,22 @@ export const columns = [
         enableHiding: false,
     },
     {
-        accessorKey: "email",
+        accessorKey: "categoryId",
         header: ({ column }) => {
             return (
                 <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    Email
+                    Id
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             )
         },
-        cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+        cell: ({ row }) => <div className="lowercase">{row.getValue("categoryId")}</div>,
     },
     {
-        accessorKey: "fullName",
+        accessorKey: "name",
         header: ({ column }) => {
             return (
                 <Button
@@ -86,45 +87,38 @@ export const columns = [
                 </Button>
             )
         },
-        cell: ({ row }) => <div>{row.getValue("fullName")}</div>,
-    },    
+        cell: ({ row }) => <div>{row.getValue("name")}</div>,
+    },
     {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const user = row.original          
-
-            const [removeUser] = useRemoveUserFromClientMutation()
+            const category = row.original
+            const [deleteCategory] = useDeleteCategoryMutation()
             const { toast } = useToast()
             const dispatch = useDispatch()
 
-            const removeUserFromClient = async ({ userId, clientId }) => {
-
-                const request = {
-                    userId: userId,
-                    clientId: clientId
-                }
-
+            const handleDelete = async ({ id }) => {
                 try {
-                    const response = await removeUser(request).unwrap()
-        
+                    const response = await deleteCategory({categoryId: id}).unwrap()
+
                     if (response.isSuccess) {
-                        dispatch(apiSlice.util.invalidateTags(["client-users"]))
+                        dispatch(apiSlice.util.invalidateTags(["category"]))
                         toast({
-                            title: "Removed successfully!",
-                            description: "User was successfully removed from the Client!",
+                            title: "Deleted successfully!",
+                            description: "Category was successfully deleted!",
                         })
                     }
                     else {
                         toast({
-                            title: "Removeing the User was unsuccessfull!",
+                            title: "Deleting the Category was unsuccessfull!",
                             description: response.errorMessage,
                         })
                     }
                 } catch (err) {
                     console.log(err);
                 }
-            }            
+            }
 
             return (
                 <DropdownMenu>
@@ -137,13 +131,13 @@ export const columns = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(user.userId)}
+                            onClick={() => navigator.clipboard.writeText(category.categoryId)}
                         >
-                            Copy User Id
+                            Copy Category Id
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <a onClick={() => {removeUserFromClient({ userId: user.userId, clientId: user.clientId })}}>Remove User from Client</a>
+                            <a onClick={() => {handleDelete({ id: category.categoryId })}}>Delete</a>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -152,13 +146,13 @@ export const columns = [
     },
 ]
 
-const ClientUsersDataTable = ({ data }) => {
+const CategoriesDataTable = ({ data }) => {
     const [sorting, setSorting] = React.useState([])
     const [columnFilters, setColumnFilters] = React.useState([])
     const [columnVisibility, setColumnVisibility] =
         React.useState({})
     const [rowSelection, setRowSelection] = React.useState({})
-    
+
     const table = useReactTable({
         data,
         columns,
@@ -177,20 +171,21 @@ const ClientUsersDataTable = ({ data }) => {
             rowSelection,
         },
     })
-    
+
     return (
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter emails..."
-                    value={(table.getColumn("email")?.getFilterValue()) ?? ""}
+                    placeholder="Filter names..."
+                    value={(table.getColumn("name")?.getFilterValue()) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("email")?.setFilterValue(event.target.value)
+                        table.getColumn("name")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
+                <CategoryAddDrawer />
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>                        
+                    <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-2">
                             Columns <ChevronDown className="ml-2 h-4 w-4" />
                         </Button>
@@ -294,4 +289,4 @@ const ClientUsersDataTable = ({ data }) => {
     )
 }
 
-export default ClientUsersDataTable
+export default CategoriesDataTable

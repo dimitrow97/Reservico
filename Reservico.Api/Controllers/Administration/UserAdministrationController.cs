@@ -68,7 +68,7 @@ namespace Reservico.Api.Controllers.Administration
         [ProducesResponseType(typeof(ServiceResponse<ListViewModel<UserDetailsViewModel>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll(string filter = null, int skip = 0, int take = 10)
+        public async Task<IActionResult> GetAll(string filter = null, int skip = 0, int take = int.MaxValue)
         {
             try
             {
@@ -155,8 +155,6 @@ namespace Reservico.Api.Controllers.Administration
 
             try
             {
-                var initiatorId = this.GetUserId();
-
                 var response = await userManager.UpdateAsync(model);
 
                 if (!response.IsSuccess)

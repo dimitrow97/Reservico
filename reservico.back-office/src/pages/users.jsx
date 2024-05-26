@@ -1,6 +1,6 @@
-import ClientsDataTable from "../components/clients/clients-data-table"
 import Loader from "../components/common/loader"
-import { useGetClientsQuery } from "../features/clients/clients-api-slice"
+import UsersDataTable from "../components/users/users-data-table"
+import { useGetUsersQuery } from "../features/users/users-api-slice"
 
 import {
     Card,
@@ -9,14 +9,14 @@ import {
     CardTitle,
   } from "@/components/ui/card"
 
-const Clients = () => {
+const Users = () => {
     const {
-        data: clients,
+        data: users,
         isLoading,
         isSuccess,
         isError,
         error
-    } = useGetClientsQuery()
+    } = useGetUsersQuery()
 
     let content;
     if (isLoading) {
@@ -25,18 +25,18 @@ const Clients = () => {
         content = (
             <Card className="w-full h-full">
                 <CardHeader>
-                    <CardTitle>Clients</CardTitle>
+                    <CardTitle>Users</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4">
-                    <ClientsDataTable data={clients.data} />
+                    <UsersDataTable data={users.data.data} />
                 </CardContent>
             </Card>
         )
     } else if (isError) {
         content = <p>{JSON.stringify(error)}</p>;
-    }
+    }    
 
     return content
 }
 
-export default Clients
+export default Users

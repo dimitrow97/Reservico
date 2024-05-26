@@ -8,6 +8,9 @@ namespace Reservico.Identity.UserClients
         Task<ServiceResponse> AddUserToClient(
             AddUserToClientRequest request);
 
+        Task<ServiceResponse> ReactivateUserClient(
+            AddUserToClientRequest request);
+
         Task<ServiceResponse<RemoveUserFromClientResponse>> RemoveUserFromClient(
             RemoveUserFromClientRequest request);
 

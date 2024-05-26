@@ -29,11 +29,14 @@ import { useToast } from "@/components/ui/use-toast"
 import { useState } from 'react'
 import { useAddClientMutation } from "../../features/clients/clients-api-slice"
 import { ClientAddSchema } from "../../schema";
+import { apiSlice } from "../../app/api/api-slice"
+import { useDispatch } from "react-redux"
 
 export function ClientAddDrawer() {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const { toast } = useToast()
+    const dispatch = useDispatch()
     const [addClient] = useAddClientMutation()
 
     const form = useForm({
@@ -61,9 +64,8 @@ export function ClientAddDrawer() {
         try {
             const response = await addClient(clientToAdd).unwrap()
 
-            console.log(response)
-
             if (response.isSuccess) {
+                dispatch(apiSlice.util.invalidateTags(["client"]))
                 setLoading(false)
                 toast({
                     title: "Client Created Successfully!",

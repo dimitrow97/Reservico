@@ -95,7 +95,7 @@ builder.Services
     .AddTransient(typeof(ICodeProvider<>), typeof(CodeProvider<>));
 
 builder.Services
-    .AddSingleton(ReservicoAutoMapperConfig.RegisterMappings(Assembly.Load("Reservico.Identity")));
+    .AddSingleton(ReservicoAutoMapperConfig.RegisterMappings(Assembly.Load("Reservico.Identity"), Assembly.Load("Reservico.Services")));
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

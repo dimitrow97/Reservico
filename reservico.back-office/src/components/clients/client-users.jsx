@@ -1,5 +1,6 @@
 import ClientUsersDataTable from "./client-users-data-table";
 import { useGetUsersForClientQuery } from "../../features/users/users-api-slice"
+import Loader from "../common/loader";
 
 const ClientUsers = (props) => {
     const {
@@ -11,9 +12,10 @@ const ClientUsers = (props) => {
 
     let content;
     if (isLoading) {
-        content = <p>"Loading..."</p>;
+        content = (
+            <Loader />
+        )
     } else if (isSuccess) { 
-        console.log(users)   
         content = (
             <ClientUsersDataTable data={users.data} />
         )

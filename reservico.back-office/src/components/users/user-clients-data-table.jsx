@@ -31,9 +31,10 @@ import {
 } from "@/components/ui/table"
 import {Link, useNavigate} from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast"
-import { useRemoveUserFromClientMutation } from "../../features/users/users-api-slice"
+import { useRemoveUserFromClientMutation, useReactivateUserClientMutation } from "../../features/users/users-api-slice"
 import { useDispatch } from "react-redux"
 import { apiSlice } from "../../app/api/api-slice"
+import UserAddClientDrawer from "./user-add-client-drawer"
 
 export const columns = [
     {
@@ -59,22 +60,22 @@ export const columns = [
         enableHiding: false,
     },
     {
-        accessorKey: "email",
+        accessorKey: "clientId",
         header: ({ column }) => {
             return (
                 <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    Email
+                    Id
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             )
         },
-        cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-    },
+        cell: ({ row }) => <div className="lowercase">{row.getValue("clientId")}</div>,
+    },    
     {
-        accessorKey: "fullName",
+        accessorKey: "clientName",
         header: ({ column }) => {
             return (
                 <Button
@@ -86,19 +87,35 @@ export const columns = [
                 </Button>
             )
         },
-        cell: ({ row }) => <div>{row.getValue("fullName")}</div>,
+        cell: ({ row }) => <div>{row.getValue("clientName")}</div>,
+    },    
+    {
+        accessorKey: "isDeleted",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Is Deleted?
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => <div>{row.original.isDeleted.toString()}</div>,
     },    
     {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const user = row.original          
+            const client = row.original          
 
             const [removeUser] = useRemoveUserFromClientMutation()
+            const [reactivate] = useReactivateUserClientMutation()
             const { toast } = useToast()
             const dispatch = useDispatch()
 
-            const removeUserFromClient = async ({ userId, clientId }) => {
+            const removeClientFromUser = async ({ userId, clientId }) => {
 
                 const request = {
                     userId: userId,
@@ -112,12 +129,40 @@ export const columns = [
                         dispatch(apiSlice.util.invalidateTags(["client-users"]))
                         toast({
                             title: "Removed successfully!",
-                            description: "User was successfully removed from the Client!",
+                            description: "Client was successfully removed from the User!",
                         })
                     }
                     else {
                         toast({
-                            title: "Removeing the User was unsuccessfull!",
+                            title: "Removing the Client was unsuccessfull!",
+                            description: response.errorMessage,
+                        })
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            }            
+
+            const reactivateClient = async ({ userId, clientId }) => {
+
+                const request = {
+                    userId: userId,
+                    clientId: clientId
+                }
+
+                try {
+                    const response = await reactivate(request).unwrap()
+        
+                    if (response.isSuccess) {
+                        dispatch(apiSlice.util.invalidateTags(["client-users"]))
+                        toast({
+                            title: "Reactivated successfully!",
+                            description: "Client was successfully reactivated for the User!",
+                        })
+                    }
+                    else {
+                        toast({
+                            title: "Reactivating the Client was unsuccessfull!",
                             description: response.errorMessage,
                         })
                     }
@@ -137,13 +182,16 @@ export const columns = [
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(user.userId)}
+                            onClick={() => navigator.clipboard.writeText(client.userId)}
                         >
-                            Copy User Id
+                            Copy Client Id
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
-                            <a onClick={() => {removeUserFromClient({ userId: user.userId, clientId: user.clientId })}}>Remove User from Client</a>
+                            <a onClick={() => {removeClientFromUser({ userId: client.userId, clientId: client.clientId })}}>Remove Client from User</a>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <a onClick={() => {reactivateClient({ userId: client.userId, clientId: client.clientId })}}>Reactivate Client</a>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -152,7 +200,7 @@ export const columns = [
     },
 ]
 
-const ClientUsersDataTable = ({ data }) => {
+const UserClientsDataTable = ({ data, userId }) => {
     const [sorting, setSorting] = React.useState([])
     const [columnFilters, setColumnFilters] = React.useState([])
     const [columnVisibility, setColumnVisibility] =
@@ -182,13 +230,14 @@ const ClientUsersDataTable = ({ data }) => {
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter emails..."
-                    value={(table.getColumn("email")?.getFilterValue()) ?? ""}
+                    placeholder="Filter name..."
+                    value={(table.getColumn("clientName")?.getFilterValue()) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("email")?.setFilterValue(event.target.value)
+                        table.getColumn("clientName")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
+                <UserAddClientDrawer userId={userId} />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>                        
                         <Button variant="outline" className="ml-2">
@@ -294,4 +343,4 @@ const ClientUsersDataTable = ({ data }) => {
     )
 }
 
-export default ClientUsersDataTable
+export default UserClientsDataTable

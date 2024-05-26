@@ -3,7 +3,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import ClientEditDialog from "./client-edit-dialog";
 import ClientDeleteAlertDialog from "./client-delete-alert-dialog"
-import { useSelector } from 'react-redux'
+import Loader from "../common/loader";
 
 const ClientDetailsForm = (props) => {
     const {
@@ -15,7 +15,7 @@ const ClientDetailsForm = (props) => {
 
     let content;
     if (isLoading) {
-        content = <p>"Loading..."</p>;
+        content = <Loader />;
     } else if (isSuccess) {    
         content = (
             <div>

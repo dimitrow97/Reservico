@@ -76,7 +76,7 @@ const Sidebar = () => {
                 <Command style={{ overflow: 'visible' }}>
                     <CommandList style={{ overflow: 'visible' }}>
                         {menuList.map((menu, key) => (
-                            <div>
+                            <div key={key}>
                                 <CommandGroup key={key} heading={menu.group}>
                                     {menu.items.map((option, optionKey) =>
                                         <CommandItem key={optionKey} className="flex gap-2">

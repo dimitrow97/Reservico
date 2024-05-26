@@ -13,51 +13,53 @@ import {
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useUpdateClientMutation } from "../../features/clients/clients-api-slice"
+import { useUpdateUserMutation } from "../../features/users/users-api-slice"
 import { useToast } from "@/components/ui/use-toast"
 import { useState } from 'react'
 import { apiSlice } from "../../app/api/api-slice"
 import { useDispatch } from "react-redux"
 
-export function ClientEditDialog(props) {
-    const [updateClient] = useUpdateClientMutation()
+export function UserEditDialog(props) {
+    const [updateUser] = useUpdateUserMutation()
     const { toast } = useToast()
     const [open, setOpen] = useState(false);    
     const dispatch = useDispatch()
 
-    const [id] = useState(props.props.id)
-    const [name, setName] = useState(props.props.name)
-    const [address, setAddress] = useState(props.props.address)
-    const [city, setCity] = useState(props.props.city)
-    const [postcode, setPostcode] = useState(props.props.postcode)
-    const [country, setCountry] = useState(props.props.country)
+    const [id] = useState(props.props.userId)
+    const [firstName, setFirstName] = useState(props.props.firstName)
+    const [lastName, setLastName] = useState(props.props.lastName)
+    const [email, setEmail] = useState(props.props.email)
+    const [phoneNumber, setPhoneNumber] = useState(props.props.phoneNumber)
 
-    const handleNameInput = (e) => setName(e.target.value)
-    const handleAddressInput = (e) => setAddress(e.target.value)
-    const handleCityInput = (e) => setCity(e.target.value)
-    const handlePostcodeInput = (e) => setPostcode(e.target.value)
-    const handleCountryInput = (e) => setCountry(e.target.value)
+    const handleFirstNameInput = (e) => setFirstName(e.target.value)
+    const handleLastNameInput = (e) => setLastName(e.target.value)
+    const handleEmailInput = (e) => setEmail(e.target.value)
+    const handlePhoneNumberInput = (e) => setPhoneNumber(e.target.value)
 
     const onSubmit = async (e) => {
         e.preventDefault()
 
-        const clientToUpdate = {
-            id: id,
-            name: name,
-            address: address,
-            city: city,
-            postCode: postcode,
-            country: country,
+        const userToUpdate = {
+            userId: id,
+            email: email,
+            firstName: firstName,
+            lastName: lastName,
+            salutation: props.props.salutation,
+            phoneNumber: phoneNumber,
+            isActive: props.props.isActive,
+            isUsingDefaultPassword: props.props.isUsingDefaultPassword,
+            roles: props.props.roles,
+            clients: props.props.clients
         }
 
         try {
-            const response = await updateClient(clientToUpdate).unwrap()
+            const response = await updateUser(userToUpdate).unwrap()
 
             if (response.isSuccess) {
-                dispatch(apiSlice.util.invalidateTags(["client"]))
+                dispatch(apiSlice.util.invalidateTags(["users"]))
                 toast({
                     title: "Update Complete!",
-                    description: "You have successfully updated Client with Id: " + id,
+                    description: "You have successfully updated User with Id: " + id,
                 })
             }
             else {
@@ -76,15 +78,15 @@ export function ClientEditDialog(props) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-1/4 p-2">Edit Client</Button>
+                <Button variant="outline" className="w-1/4 p-2">Edit User</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[650px]">
                 <DialogHeader>
                     <DialogTitle className="drop-shadow-lg">
-                        Edit Client
+                        Edit User
                     </DialogTitle>
                     <DialogDescription>
-                        Make changes to the client here. Click save when you're done.
+                        Make changes to the user here. Click save when you're done.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={onSubmit}>
@@ -101,61 +103,51 @@ export function ClientEditDialog(props) {
                             />
                         </div>
                         <div className="grid grid-cols-12 items-center gap-4">
-                            <Label htmlFor="name" className="text-right col-span-2">
-                                Name
+                            <Label htmlFor="firstName" className="text-right col-span-2">
+                                First Name
                             </Label>
                             <Input
-                                id="name"
+                                id="firstName"
                                 className="col-span-10"
-                                onChange={handleNameInput}
-                                value={name}
+                                onChange={handleFirstNameInput}
+                                value={firstName}
                                 required
                             />
                         </div>
                         <div className="grid grid-cols-12 items-center gap-4">
-                            <Label htmlFor="address" className="text-right col-span-2">
-                                Address
+                            <Label htmlFor="lastName" className="text-right col-span-2">
+                                Last Name
                             </Label>
                             <Input
-                                id="address"
+                                id="lastName"
                                 className="col-span-10"
-                                onChange={handleAddressInput}
-                                value={address}
+                                onChange={handleLastNameInput}
+                                value={lastName}
+                                required
                             />
                         </div>
                         <div className="grid grid-cols-12 items-center gap-4">
-                            <Label htmlFor="city" className="text-right col-span-2">
-                                City
+                            <Label htmlFor="email" className="text-right col-span-2">
+                                Email
                             </Label>
                             <Input
-                                id="city"
+                                id="email"
                                 className="col-span-10"
-                                onChange={handleCityInput}
-                                value={city}
+                                onChange={handleEmailInput}
+                                value={email}
                             />
                         </div>
                         <div className="grid grid-cols-12 items-center gap-4">
-                            <Label htmlFor="postcode" className="text-right col-span-2">
-                                Post Code
+                            <Label htmlFor="phoneNumber" className="text-right col-span-2">
+                                Phone Number
                             </Label>
                             <Input
-                                id="postcode"
+                                id="phoneNumber"
                                 className="col-span-10"
-                                onChange={handlePostcodeInput}
-                                value={postcode}
+                                onChange={handlePhoneNumberInput}
+                                value={phoneNumber}
                             />
-                        </div>
-                        <div className="grid grid-cols-12 items-center gap-4">
-                            <Label htmlFor="country" className="text-right col-span-2">
-                                Country
-                            </Label>
-                            <Input
-                                id="country"
-                                className="col-span-10"
-                                onChange={handleCountryInput}
-                                value={country}
-                            />
-                        </div>
+                        </div>                        
                     </div>
                     <DialogFooter>
                         <Button type="submit" className="bg-green-500 hover:bg-green-600">
@@ -168,4 +160,4 @@ export function ClientEditDialog(props) {
     )
 }
 
-export default ClientEditDialog
+export default UserEditDialog

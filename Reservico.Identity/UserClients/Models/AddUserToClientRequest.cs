@@ -6,8 +6,7 @@ namespace Reservico.Identity.UserClients.Models
     public class AddUserToClientRequest
     {
         [Required]
-        [EmailAddress]
-        public string UserEmail { get; set; }
+        public Guid UserId { get; set; }
 
         [Required]
         public Guid ClientId { get; set; }

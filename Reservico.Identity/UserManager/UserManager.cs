@@ -59,6 +59,12 @@ namespace Reservico.Identity.UserManager
                     new UserRegistrationResponseModel(UserRegisterStatus.Reactivated));
             }
 
+            if (userExists.IsSuccess)
+            {
+                return ServiceResponse<UserRegistrationResponseModel>.Error(
+                    "User with the provided email already exists!");
+            }
+
             var user = new User()
             {
                 Id = Guid.NewGuid(),
@@ -116,7 +122,7 @@ namespace Reservico.Identity.UserManager
                 .Query()
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-                .FirstOrDefault(u => u.Id.Equals(model.UserId));
+                .FirstOrDefault(u => u.Id.ToString().Equals(model.UserId));
 
             if (user == null)
             {

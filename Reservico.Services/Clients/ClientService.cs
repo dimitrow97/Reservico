@@ -141,6 +141,7 @@ namespace Reservico.Services.Clients
             }
 
             var users = client.UserClients
+                .Where(c => !c.IsDeleted)
                 .Where(x => !x.User.IsDeleted)
                 .Select(uc => new UserViewModel
                 {

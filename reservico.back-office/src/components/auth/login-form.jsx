@@ -50,7 +50,7 @@ const LoginForm = () => {
 
     try {
       const auth = await login({ email, password, clientId, grantType }).unwrap()
-      
+
       const userData = await token({ authorizationCode: auth.authorizationCode }).unwrap()
 
       dispatch(setCredentials({ ...userData, email }))
@@ -69,7 +69,6 @@ const LoginForm = () => {
       errRef.current.focus();
     }
 
-    console.log(errMsg)
     setLoading(false)
   };
 
