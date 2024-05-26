@@ -48,11 +48,6 @@ const menuList = [
         group: "Entities",
         items: [
             {
-                icon: <MapPin className="mr-2 h-4 w-4" />,
-                link: "/locations",
-                text: "Locations"
-            },
-            {
                 icon: <Calendar className="mr-2 h-4 w-4" />,
                 link: "/reservations",
                 text: "Reservations"

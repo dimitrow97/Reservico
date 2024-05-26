@@ -5,6 +5,12 @@ namespace Reservico.Services.Reservations
 {
     public interface IReservationService
     {
+        Task<ServiceResponse<IEnumerable<ReservationViewModel>>> GetAll(
+            Guid? locationId);
+
+        Task<ServiceResponse<ReservationViewModel>> Get(
+            Guid reservationId);
+
         Task<ServiceResponse> MakeReservation(
             MakeReservationRequestModel model);
 

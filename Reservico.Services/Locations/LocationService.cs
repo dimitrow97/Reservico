@@ -6,6 +6,7 @@ using Reservico.Data.Interfaces;
 using Reservico.Services.Categories;
 using Reservico.Services.Clients;
 using Reservico.Services.Locations.Models;
+using Reservico.Services.Reservations.Models;
 
 namespace Reservico.Services.Locations
 {
@@ -116,9 +117,6 @@ namespace Reservico.Services.Locations
 
             var result = this.mapper.Map(location, new LocationDetailsViewModel());
 
-            var tables = await this.GetLocationTables(location.Id);
-
-            result.Tables = tables.IsSuccess ? tables.Data : new List<Table>();
             result.LastFiveReservations = await this.GetLastFiveReservations(location.Id);
 
             return ServiceResponse<LocationDetailsViewModel>.Success(result);
@@ -308,14 +306,33 @@ namespace Reservico.Services.Locations
             return ServiceResponse.Success();
         }
 
-        private async Task<IEnumerable<Reservation>> GetLastFiveReservations(
+        private async Task<IEnumerable<ReservationViewModel>> GetLastFiveReservations(
             Guid locationId)
         {
             var lastFiveReservations = await this.reservationRepository
                 .Query()
                 .Include(x => x.Table)
+                    .Include(x => x.Table.Location)
                 .Where(x => x.Table.LocationId.Equals(locationId))
+                .OrderByDescending(x => x.CreatedOn)
                 .Take(5)
+                .Select(reservation => new ReservationViewModel
+                {
+                    Id = reservation.Id,
+                    GuestsArrivingAt = reservation.GuestsArrivingAt,
+                    FirstName = reservation.FirstName,
+                    LastName = reservation.LastName,
+                    Email = reservation.Email,
+                    PhoneNumber = reservation.PhoneNumber,
+                    IsConfirmed = reservation.IsConfirmed,
+                    Note = reservation.Note,
+                    NumberOfGuests = reservation.NumberOfGuests,
+                    IsDeleted = reservation.IsDeleted,
+                    LocationId = reservation.Table.LocationId,
+                    LocationName = reservation.Table.Location.Name,
+                    TableId = reservation.TableId,
+                    TableName = reservation.Table.Name
+                })
                 .ToListAsync();
 
             return lastFiveReservations;

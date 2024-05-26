@@ -48,6 +48,96 @@ namespace Reservico.Common.EmailSender
             await this.SendMailAsync(message);
         }
 
+        public async Task ReservationCreatedEmail(
+            string reservationEmail,
+            DateTime guestsArrivingAt,
+            int numberOfGuests,
+            string locationName)
+        {
+            var emailFromAddress = this.GetEmailFromAddress();
+
+            var message = new MailMessage(emailFromAddress, reservationEmail)
+            {
+                Body = $"<p>A Reservation in your name has been placed through Reservico</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>",
+                Subject = "Reservico Reservation",
+                IsBodyHtml = true
+            };
+
+            await this.SendMailAsync(message);
+        }
+
+        public async Task ReservationConfirmedEmail(
+            string reservationEmail,
+            DateTime guestsArrivingAt,
+            int numberOfGuests,
+            string locationName)
+        {
+            var emailFromAddress = this.GetEmailFromAddress();
+
+            var message = new MailMessage(emailFromAddress, reservationEmail)
+            {
+                Body = $"<p>A Reservation from Reservico has been Confirmed</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>",
+                Subject = "Reservico Reservation Confirmation",
+                IsBodyHtml = true
+            };
+
+            await this.SendMailAsync(message);
+        }
+
+        public async Task ReservationCancelledEmail(
+            string reservationEmail,
+            DateTime guestsArrivingAt,
+            int numberOfGuests,
+            string locationName)
+        {
+            var emailFromAddress = this.GetEmailFromAddress();
+
+            var message = new MailMessage(emailFromAddress, reservationEmail)
+            {
+                Body = $"<p>You have Cancelled your Reservation from Reservico</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>",
+                Subject = "Reservico Reservation Cancellation",
+                IsBodyHtml = true
+            };
+
+            await this.SendMailAsync(message);
+        }
+
+        public async Task ReservationCancelledEmailToLocation(
+            string locationEmail,
+            DateTime guestsArrivingAt,
+            int numberOfGuests,
+            string locationName)
+        {
+            var emailFromAddress = this.GetEmailFromAddress();
+
+            var message = new MailMessage(emailFromAddress, locationEmail)
+            {
+                Body = $"<p>A Reservation for your Location has been Cancelled on Reservico</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>",
+                Subject = "Reservico Reservation Cancellation",
+                IsBodyHtml = true
+            };
+
+            await this.SendMailAsync(message);
+        }
+
+        public async Task ReservationEmailToLocation(
+            string locationEmail,
+            DateTime guestsArrivingAt,
+            int numberOfGuests,
+            string locationName)
+        {
+            var emailFromAddress = this.GetEmailFromAddress();
+
+            var message = new MailMessage(emailFromAddress, locationEmail)
+            {
+                Body = $"<p>New Reservation has been placed through Reservico</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>",
+                Subject = "Reservico Reservation",
+                IsBodyHtml = true
+            };
+
+            await this.SendMailAsync(message);
+        }
+
         private async Task SendMailAsync(
             MailMessage message)
         {

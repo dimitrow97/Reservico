@@ -7,6 +7,8 @@ import ClientDetails from './pages/client-details'
 import AccountProfile from './pages/account-profile'
 import Users from './pages/users'
 import UserDetails from './pages/user-details'
+import Reservations from './pages/reservations'
+import ReservationDetails from './pages/reservation-details'
 import Categories from './pages/categories'
 import RequireAuth from './features/auth/require-auth'
 import './App.css'
@@ -27,6 +29,8 @@ function App() {
           <Route path="account-profile" element={<AccountProfile />} />
           <Route path="users" element={<Users />} />
           <Route path="user-details" element={<UserDetails />} />
+          <Route path="reservations" element={<Reservations />} />
+          <Route path="reservation-details" element={<ReservationDetails />} />
           <Route path="categories" element={<Categories />} />
         </Route>
       </Route>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Reservico.Common.EmailSender;
 using Reservico.Common.Models;
 using Reservico.Data.Entities;
 using Reservico.Data.Interfaces;
@@ -9,15 +10,94 @@ namespace Reservico.Services.Reservations
 {
     public class ReservationService : IReservationService
     {
+        private readonly IEmailSender emailSender;
         private readonly ILocationService locationService;
         private readonly IRepository<Reservation> reservationRepository;
 
         public ReservationService(
+            IEmailSender emailSender,
             ILocationService locationService,
             IRepository<Reservation> reservationRepository) 
         {
+            this.emailSender = emailSender;
             this.locationService = locationService;
             this.reservationRepository = reservationRepository;
+        }
+
+        public async Task<ServiceResponse<IEnumerable<ReservationViewModel>>> GetAll(
+            Guid? locationId)
+        {
+            var reservationsQuery = this.reservationRepository
+                .Query()
+                .Include(x => x.Table)
+                    .ThenInclude(x => x.Location);
+
+            if (locationId.HasValue)
+            {
+                reservationsQuery.Where(x => 
+                    x.Table.LocationId.Equals(locationId.Value));
+            }
+
+            var reservations = await reservationsQuery
+                .OrderBy(x => x.GuestsArrivingAt < DateTime.UtcNow.Date)
+                     .ThenBy(x => x.GuestsArrivingAt)
+                .ToListAsync();
+
+            return ServiceResponse<IEnumerable<ReservationViewModel>>.Success(
+                reservations.Select(x => new ReservationViewModel
+                {
+                    Id = x.Id,
+                    GuestsArrivingAt = x.GuestsArrivingAt,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Email = x.Email,
+                    PhoneNumber = x.PhoneNumber,
+                    IsConfirmed = x.IsConfirmed,
+                    Note = x.Note,
+                    NumberOfGuests = x.NumberOfGuests,
+                    IsDeleted = x.IsDeleted,
+                    LocationId = x.Table.LocationId,
+                    LocationName = x.Table.Location.Name,
+                    TableId = x.TableId,
+                    TableName = x.Table.Name
+                }));
+        }
+
+        public async Task<ServiceResponse<ReservationViewModel>> Get(
+            Guid reservationId)
+        {
+            var reservation = await this.reservationRepository
+                .Query()
+                .Include(x => x.Table)
+                    .ThenInclude(x => x.Location)
+                .FirstOrDefaultAsync(x => x.Id.Equals(reservationId));
+
+            if (reservation is null)
+            {
+                return ServiceResponse<ReservationViewModel>.Error(
+                    "Reservation does NOT exists!");
+            }
+
+            var result = new ReservationViewModel
+            {
+                Id = reservation.Id,
+                GuestsArrivingAt = reservation.GuestsArrivingAt,
+                FirstName = reservation.FirstName,
+                LastName = reservation.LastName,
+                Email = reservation.Email,
+                PhoneNumber = reservation.PhoneNumber,
+                IsConfirmed = reservation.IsConfirmed,
+                Note = reservation.Note,
+                NumberOfGuests = reservation.NumberOfGuests,
+                IsDeleted = reservation.IsDeleted,
+                LocationId = reservation.Table.LocationId,
+                LocationName = reservation.Table.Location.Name,
+                TableId = reservation.TableId,
+                TableName = reservation.Table.Name
+            };
+
+            return ServiceResponse<ReservationViewModel>
+                .Success(result);
         }
 
         public async Task<ServiceResponse> MakeReservation(
@@ -58,7 +138,20 @@ namespace Reservico.Services.Reservations
 
             await this.reservationRepository.AddAsync(reservation);
 
-            //send email for created reservation
+            var location = await this.locationService.Get(
+                model.LocationId);
+
+            await this.emailSender.ReservationCreatedEmail(
+                reservation.Email,
+                reservation.GuestsArrivingAt,
+                reservation.NumberOfGuests,
+                location.Data.Name);
+
+            await this.emailSender.ReservationEmailToLocation(
+                location.Data.Email,
+                reservation.GuestsArrivingAt,
+                reservation.NumberOfGuests,
+                location.Data.Name);
 
             return ServiceResponse.Success();
         }
@@ -87,14 +180,21 @@ namespace Reservico.Services.Reservations
             }
 
             var reservation = await this.reservationRepository
-                .GetByIdAsync(reservationId);
+                .Query()
+                .Include(x => x.Table)
+                    .ThenInclude(x => x.Location)
+                .FirstOrDefaultAsync(x => x.Id.Equals(reservationId));
 
             reservation.UpdatedOn = DateTime.UtcNow;
             reservation.IsConfirmed = true;
 
             await this.reservationRepository.UpdateAsync(reservation);
 
-            //send email to Confirm
+            await this.emailSender.ReservationCreatedEmail(
+                reservation.Email,
+                reservation.GuestsArrivingAt,
+                reservation.NumberOfGuests,
+                reservation.Table.Location.Name);
 
             return ServiceResponse.Success();
         }
@@ -110,7 +210,10 @@ namespace Reservico.Services.Reservations
             }
 
             var reservation = await this.reservationRepository
-                .GetByIdAsync(reservationId);
+                .Query()
+                .Include(x => x.Table)
+                    .ThenInclude(x => x.Location)
+                .FirstOrDefaultAsync(x => x.Id.Equals(reservationId));
 
             if (reservation.IsConfirmed)
             {
@@ -124,7 +227,17 @@ namespace Reservico.Services.Reservations
 
             await this.reservationRepository.UpdateAsync(reservation);
 
-            //send email to Cancel
+            await this.emailSender.ReservationCancelledEmail(
+               reservation.Email,
+               reservation.GuestsArrivingAt,
+               reservation.NumberOfGuests,
+               reservation.Table.Location.Name);
+
+            await this.emailSender.ReservationCancelledEmailToLocation(
+               reservation.Table.Location.Email,
+               reservation.GuestsArrivingAt,
+               reservation.NumberOfGuests,
+               reservation.Table.Location.Name);
 
             return ServiceResponse.Success();
         }
