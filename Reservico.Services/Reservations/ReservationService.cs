@@ -12,36 +12,48 @@ namespace Reservico.Services.Reservations
     {
         private readonly IEmailSender emailSender;
         private readonly ILocationService locationService;
+        private readonly IRepository<Table> tableRepository;
         private readonly IRepository<Reservation> reservationRepository;
 
         public ReservationService(
             IEmailSender emailSender,
             ILocationService locationService,
-            IRepository<Reservation> reservationRepository) 
+            IRepository<Table> tableRepository,
+            IRepository<Reservation> reservationRepository)
         {
             this.emailSender = emailSender;
             this.locationService = locationService;
+            this.tableRepository = tableRepository;
             this.reservationRepository = reservationRepository;
         }
 
         public async Task<ServiceResponse<IEnumerable<ReservationViewModel>>> GetAll(
-            Guid? locationId)
+            Guid? clientId)
         {
             var reservationsQuery = this.reservationRepository
                 .Query()
                 .Include(x => x.Table)
-                    .ThenInclude(x => x.Location);
+                    .ThenInclude(x => x.Location)
+                        .ThenInclude(x => x.Client)
+                .Where(x => !x.Table.IsDeleted && !x.Table.Location.IsDeleted && !x.Table.Location.Client.IsDeleted);
 
-            if (locationId.HasValue)
+            List<Reservation> reservations;
+
+            if (clientId.HasValue)
             {
-                reservationsQuery.Where(x => 
-                    x.Table.LocationId.Equals(locationId.Value));
+                reservations = await reservationsQuery
+                    .Where(x => x.Table.Location.ClientId.Equals(clientId.Value))
+                    .OrderBy(x => x.GuestsArrivingAt < DateTime.UtcNow.Date)
+                        .ThenBy(x => x.GuestsArrivingAt)
+                    .ToListAsync();
             }
-
-            var reservations = await reservationsQuery
-                .OrderBy(x => x.GuestsArrivingAt < DateTime.UtcNow.Date)
-                     .ThenBy(x => x.GuestsArrivingAt)
-                .ToListAsync();
+            else
+            {
+                reservations = await reservationsQuery
+                    .OrderBy(x => x.GuestsArrivingAt < DateTime.UtcNow.Date)
+                         .ThenBy(x => x.GuestsArrivingAt)
+                    .ToListAsync();
+            }
 
             return ServiceResponse<IEnumerable<ReservationViewModel>>.Success(
                 reservations.Select(x => new ReservationViewModel
@@ -185,12 +197,20 @@ namespace Reservico.Services.Reservations
                     .ThenInclude(x => x.Location)
                 .FirstOrDefaultAsync(x => x.Id.Equals(reservationId));
 
+            var check = await CheckIfTableAlreadyTaken(reservation);
+
+            if (!check.IsSuccess)
+            {
+                return ServiceResponse.Error(
+                    check.ErrorMessage);
+            }
+
             reservation.UpdatedOn = DateTime.UtcNow;
             reservation.IsConfirmed = true;
 
             await this.reservationRepository.UpdateAsync(reservation);
 
-            await this.emailSender.ReservationCreatedEmail(
+            await this.emailSender.ReservationConfirmedEmail(
                 reservation.Email,
                 reservation.GuestsArrivingAt,
                 reservation.NumberOfGuests,
@@ -242,30 +262,55 @@ namespace Reservico.Services.Reservations
             return ServiceResponse.Success();
         }
 
+        private async Task<ServiceResponse> CheckIfTableAlreadyTaken(
+            Reservation reservation)
+        {
+            var isTableAlreadyTaken = await this.reservationRepository
+                .Query()
+                .Include(x => x.Table)
+                .Where(x => x.IsConfirmed && !x.IsDeleted)
+                .Where(x => x.TableId.Equals(reservation.TableId))
+                .Where(x => x.GuestsArrivingAt.Equals(reservation.GuestsArrivingAt) ||
+                    (x.GuestsArrivingAt.Date.Equals(reservation.GuestsArrivingAt.Date) &&
+                        (x.GuestsArrivingAt.AddHours(x.Table.TableTurnOffset) <= reservation.GuestsArrivingAt ||
+                         x.GuestsArrivingAt.AddHours((x.Table.TableTurnOffset * -1)) >= reservation.GuestsArrivingAt)))
+                .FirstOrDefaultAsync();
+
+            if (isTableAlreadyTaken is not null) 
+            {
+                return ServiceResponse.Error("A Reservation has been already confirmed for this table, date and time.");
+            }
+
+            return ServiceResponse.Success();
+        }
+
         private async Task<ServiceResponse<Guid>> CheckForAFreeTable(
             Guid locationId,
             DateTime desiredTime,
             int numberOfGuests)
         {
-            var tables = await this.locationService.GetLocationTables(
-                locationId);
+            var tables = await this.tableRepository
+                .Query()
+                .Include(x => x.Reservations)
+                .Where(x => x.LocationId.Equals(locationId))
+                .ToListAsync();
 
             if (tables is null)
             {
                 return ServiceResponse<Guid>.Error("Location does NOT have any Tables");
             }
 
-            var table = tables.Data                
+            var table = tables
                 .Where(x => x.Capacity >= numberOfGuests)
-                .Where(x => 
+                .Where(x =>
                     (!x.CanTableTurn &&
                         x.Reservations.Any(y => y.GuestsArrivingAt.Date.Equals(desiredTime.Date) && !y.IsConfirmed)) ||
                     (x.CanTableTurn &&
-                        x.Reservations.Any(y => (!y.IsConfirmed && 
+                        x.Reservations.Any(y => (!y.IsConfirmed &&
                             (y.GuestsArrivingAt.Date.Equals(desiredTime.Date) ||
                             (y.GuestsArrivingAt.Equals(desiredTime))))
                         ) ||
-                        x.Reservations.Any(y => y.IsConfirmed && 
+                        x.Reservations.Any(y => y.IsConfirmed &&
                             y.GuestsArrivingAt.Date.Equals(desiredTime.Date) &&
                                 (y.GuestsArrivingAt.AddHours(x.TableTurnOffset) <= desiredTime ||
                                 y.GuestsArrivingAt.AddHours((x.TableTurnOffset * -1)) >= desiredTime))

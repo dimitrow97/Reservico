@@ -30,11 +30,11 @@ namespace Reservico.Api.Controllers.Common
         [ProducesResponseType(typeof(ServiceResponse<IEnumerable<ReservationViewModel>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll(Guid? locationId)
+        public async Task<IActionResult> GetAll(Guid? clientId)
         {
             try
             {
-                var response = await this.reservationService.GetAll(locationId);
+                var response = await this.reservationService.GetAll(clientId);
 
                 if (!response.IsSuccess)
                 {

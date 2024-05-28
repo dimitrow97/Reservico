@@ -153,7 +153,7 @@ namespace Reservico.Identity.UserClients
             string userId)
         {
             var uc = await this.userClientRepository.FindByConditionAsync(x =>
-               x.UserId.Equals(userId) && x.ClientId.Equals(request.ClientId));
+               x.UserId.ToString().Equals(userId) && x.ClientId.Equals(request.ClientId));
 
             if (uc is null)
             {
@@ -161,7 +161,7 @@ namespace Reservico.Identity.UserClients
             }
 
             var currentSelection = await this.userClientRepository.FindByConditionAsync(x =>
-               x.UserId.Equals(userId) &&
+               x.UserId.ToString().Equals(userId) &&
                x.IsSelected);
 
             if (currentSelection != null)

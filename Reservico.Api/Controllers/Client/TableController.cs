@@ -3,6 +3,7 @@ using Reservico.Common.Models;
 using Reservico.Identity.UserManager;
 using Reservico.Identity.UserManager.Models;
 using Reservico.Services.Clients;
+using Reservico.Services.Clients.Models;
 using Reservico.Services.Locations;
 using Reservico.Services.Locations.Models;
 
@@ -22,6 +23,54 @@ namespace Reservico.Api.Controllers.Client
             this.userManager = userManager;
             this.locationService = locationService;
             this.logger = logger;
+        }
+
+        [HttpGet("GetAll/{locationId}")]
+        [ProducesResponseType(typeof(ServiceResponse<IEnumerable<TableViewModel>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAll(Guid locationId)
+        {
+            try
+            {
+                var response = await locationService.GetLocationTables(locationId);
+
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("{tableId}")]
+        [ProducesResponseType(typeof(ServiceResponse<TableViewModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetTable(Guid tableId)
+        {
+            try
+            {
+                var response = await locationService.GetTable(tableId);
+
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
         }
 
         /// <summary>

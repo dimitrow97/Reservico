@@ -15,7 +15,7 @@ namespace Reservico.Api.Controllers.Client
         {
             this.reservationService = reservationService;
             this.logger = logger;
-        }
+        }        
 
         /// <summary>
         /// Confirms a Reservation.

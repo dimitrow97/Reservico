@@ -12,7 +12,11 @@ namespace Reservico.Services.Locations
 
         Task<ServiceResponse<IEnumerable<LocationViewModel>>> GetLocations(Guid clientId);
 
-        Task<ServiceResponse<IEnumerable<Table>>> GetLocationTables(Guid locationId);
+        Task<ServiceResponse<IEnumerable<TableViewModel>>> GetLocationTables(
+            Guid locationId);
+
+        Task<ServiceResponse<TableViewModel>> GetTable(
+            Guid tableId);
 
         Task<ServiceResponse> LocationExists(Guid locationId);
 

@@ -150,24 +150,44 @@ namespace Reservico.Services.Locations
                 .Success(locations.Select(x => this.mapper.Map(x, new LocationViewModel())));
         }
 
-        public async Task<ServiceResponse<IEnumerable<Table>>> GetLocationTables(
+        public async Task<ServiceResponse<IEnumerable<TableViewModel>>> GetLocationTables(
             Guid locationId)
         {
             var locationExists = await this.LocationExists(locationId);
 
             if (!locationExists.IsSuccess)
             {
-                return ServiceResponse<IEnumerable<Table>>.Error(
+                return ServiceResponse<IEnumerable<TableViewModel>>.Error(
                     locationExists.ErrorMessage);
             }
 
             var location = await this.locationRepository.Query()
                 .Include(x => x.Tables)
-                    .ThenInclude(x => x.Reservations)
                 .FirstOrDefaultAsync(x => x.Id.Equals(locationId));
 
-            return ServiceResponse<IEnumerable<Table>>.Success(
-                location.Tables.Where(x => !x.IsDeleted));
+            return ServiceResponse<IEnumerable<TableViewModel>>.Success(
+                location.Tables.Where(x => !x.IsDeleted)
+                .Select(x => this.mapper.Map(x, new TableViewModel())));
+        }
+
+        public async Task<ServiceResponse<TableViewModel>> GetTable(
+            Guid tableId)
+        {
+            var tableExists = await this.TableExists(tableId);
+
+            if (!tableExists.IsSuccess)
+            {
+                return ServiceResponse<TableViewModel>
+                    .Error(tableExists.ErrorMessage);
+            }
+
+            var table = await this.tableRepository.Query()
+                .Include(x => x.Location)
+                .FirstOrDefaultAsync(x => x.Id.Equals(tableId) && !x.IsDeleted);
+
+            var result = this.mapper.Map(table, new TableViewModel());
+
+            return ServiceResponse<TableViewModel>.Success(result);
         }
 
         public async Task<ServiceResponse> Update(UpdateLocationRequestModel model)
@@ -181,7 +201,10 @@ namespace Reservico.Services.Locations
                     locationExists.ErrorMessage);
             }
 
-            var location = await this.locationRepository.GetByIdAsync(model.LocationId);
+            var location = await this.locationRepository
+                .Query()
+                .Include(x => x.LocationCategories)
+                .FirstOrDefaultAsync(x => x.Id.Equals(model.LocationId));
 
             location.Name = model.Name;
             location.Email = model.Email;
@@ -346,7 +369,7 @@ namespace Reservico.Services.Locations
                 .GetAll();
 
             var categoriesInDb = categoriesAll.Data
-                .Where(r => categories.Any(x => r.CategoryId.Equals(r)));
+                .Where(r => categories.Any(x => r.CategoryId.Equals(x)));
 
             if (location.LocationCategories is null || !location.LocationCategories.Any())
             {
