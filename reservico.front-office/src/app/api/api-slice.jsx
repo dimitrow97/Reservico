@@ -48,7 +48,8 @@ export const apiSlice = createApi({
         "users",
         "locations",
         "tables",
-        "reservations"
+        "reservations",
+        "images"
     ],
     endpoints: builder => ({})
 })

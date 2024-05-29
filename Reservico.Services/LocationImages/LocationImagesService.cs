@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Reservico.Common.Models;
 using Reservico.Data.Entities;
 using Reservico.Data.Interfaces;
-using Reservico.Identity.UserPasswordManager;
 using Reservico.Services.LocationImages.Models;
 using Reservico.Services.Locations;
 
@@ -13,25 +12,22 @@ namespace Reservico.Services.LocationImages
 {
     public class LocationImagesService : ILocationImagesService
     {
-        private const string FILE_NAME = "reservico-{0}-{1}-{2}";
+        private const string FILE_NAME = "reservico/{0}/{1}/{2}";
 
         private readonly ILocationService locationService;
         private readonly BlobConfiguration blobConfiguration;
         private readonly BlobServiceClient blobServiceClient;
-        private readonly IPasswordGenerator passwordGenerator;
         private readonly BlobContainerClient blobContainerClient;
         private readonly IRepository<LocationImage> locationImageRepository;
 
         public LocationImagesService(
             ILocationService locationService,
             BlobServiceClient blobServiceClient,
-            IPasswordGenerator passwordGenerator,
             IRepository<LocationImage> locationImageRepository,
             IOptions<BlobConfiguration> configuration)
         {
             this.locationService = locationService;
             this.blobServiceClient = blobServiceClient;
-            this.passwordGenerator = passwordGenerator;
             this.locationImageRepository = locationImageRepository;
             this.blobConfiguration = configuration.Value;
 
@@ -54,8 +50,8 @@ namespace Reservico.Services.LocationImages
 
             string fileName = string.Format(
                 FILE_NAME, 
-                location.Data.Name, 
-                this.passwordGenerator.GeneratePassword(8),
+                blobConfiguration.Env,
+                location.Data.Name,
                 model.File.FileName);
 
             using (var memoryStream = new MemoryStream())
@@ -111,6 +107,28 @@ namespace Reservico.Services.LocationImages
 
             return ServiceResponse<LocationImagesViewModel>
                 .Success(result);
+        }
+
+        public async Task<ServiceResponse> DeleteLocationImages(
+            Guid locationImageId)
+        {
+            var locationImage = await this.locationImageRepository
+                .Query()
+                .Where(x => !x.IsDeleted)
+                .FirstOrDefaultAsync(x => x.Id.Equals(locationImageId));
+
+            if (locationImage is null)
+            {
+                return ServiceResponse.Error(
+                    "Location Image does NOT exist");
+            }
+
+            locationImage.IsDeleted = true;
+            locationImage.UpdatedOn = DateTime.UtcNow;
+
+            await this.locationImageRepository.UpdateAsync(locationImage);
+
+            return ServiceResponse.Success();
         }
     }
 }

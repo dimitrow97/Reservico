@@ -11,5 +11,8 @@ namespace Reservico.Services.LocationImages
 
         Task<ServiceResponse<LocationImagesViewModel>> GetLocationImages(
             Guid locationId);
+
+        Task<ServiceResponse> DeleteLocationImages(
+            Guid locationImageId);
     }
 }

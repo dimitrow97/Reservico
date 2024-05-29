@@ -77,5 +77,30 @@ namespace Reservico.Api.Controllers.Client
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
+
+        [HttpDelete]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteLocationImage(Guid locationImageId)
+        {
+            try
+            {
+                var response = await this.locationImagesService
+                    .DeleteLocationImages(locationImageId);
+
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response.ErrorMessage);
+                }
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }

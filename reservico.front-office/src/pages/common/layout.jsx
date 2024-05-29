@@ -15,7 +15,7 @@ const Layout = () => {
                     <Outlet />
                 </div>
             </main>
-            <Toaster />
+            <Toaster duration={10000} />
         </div>
     )
 }

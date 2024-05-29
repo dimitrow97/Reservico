@@ -1,5 +1,7 @@
 import LocationDetailsForm from "../components/locations/location-details-form"
 import LocationTables from "../components/locations/tables/location-tables"
+import LocationImagesAdd from "../components/locations/images/location-images-add"
+import LocationImagesScroll from "../components/locations/images/location-images-scroll"
 import { useLocation } from 'react-router-dom'
 
 import {
@@ -29,7 +31,16 @@ const LocationDetails = () => {
                 <CardContent className="grid gap-4">
                     <LocationTables id={location.state.locationId} />
                 </CardContent>
-            </Card>       
+            </Card>   
+            <Card className="h-full">
+                <CardHeader>
+                    <CardTitle>Location Images</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                    <LocationImagesAdd locationId={location.state.locationId} />
+                    <LocationImagesScroll locationId={location.state.locationId} />
+                </CardContent>
+            </Card>           
         </div>
     )
 }
