@@ -27,7 +27,14 @@ const Reservations = () => {
         content = <Loader />;
     } else if (isSuccess) {
         content = (
-            <Loader />
+            <Card className="w-full h-full">
+                <CardHeader>
+                    <CardTitle>Reservations</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                    <ReservationsDataTable data={reservations.data} />
+                </CardContent>
+            </Card>
         )
     } else if (isError) {
         content = <p>{JSON.stringify(error)}</p>;

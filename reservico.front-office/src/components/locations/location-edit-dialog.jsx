@@ -28,6 +28,7 @@ import { useState } from 'react'
 import { apiSlice } from "../../app/api/api-slice"
 import { useDispatch } from "react-redux"
 import CategoriesMultiSelect from "../categories/categories-multi-select"
+import Loader from "../common/loader"
 
 export function LocationEditDialog({ props }) {
     const [updateLocation] = useUpdateLocationMutation()
@@ -100,7 +101,7 @@ export function LocationEditDialog({ props }) {
 
     let content;
     if (isLoading) {
-        content = <p>"Loading..."</p>;
+        content = <Loader />;
     } else if (isSuccess) {
         content = (
             <Dialog open={open} onOpenChange={setOpen}>

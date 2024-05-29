@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Reservico.Common\Reservico.Common.csproj" />
     <ProjectReference Include="..\Reservico.Data\Reservico.Data.csproj" />
     <ProjectReference Include="..\Reservico.Identity\Reservico.Identity.csproj" />

@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { apiSlice } from "../../app/api/api-slice"
 import { selectCurrentClient } from "../../features/auth/auth-slice"
 import { useGetClientsForUserQuery, useUpdateUserSelectedClientMutation } from "../../features/users/users-api-slice"
+import Loader from "./loader"
 
 export function ClientSelect() {
   const {
@@ -47,7 +48,7 @@ export function ClientSelect() {
 
   let content;
   if (isLoading) {
-    content = <p>"Loading..."</p>;
+    content = <Loader />;
   } else if (isSuccess) {
     content = (
       <Select

@@ -20,6 +20,9 @@ using Reservico.Services.Clients;
 using Reservico.Services.Reservations;
 using Reservico.Services.Locations;
 using Reservico.Services.Categories;
+using Azure.Storage.Blobs;
+using Reservico.Services.LocationImages.Models;
+using Reservico.Services.LocationImages;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("reservicoDbConnection")
@@ -29,8 +32,12 @@ builder.Services.AddDbContext<ReservicoDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services
+    .Configure<BlobConfiguration>(builder.Configuration.GetSection("BlobConfig"))
     .Configure<EmailConfiguration>(builder.Configuration.GetSection("EmailConfig"))
     .Configure<IdentityAuthorizationConfig>(builder.Configuration.GetSection("IdentityAuthorizationConfig"));
+
+builder.Services
+    .AddScoped(x => new BlobServiceClient(builder.Configuration.GetConnectionString("azureBlobStorage")));
 
 // Add services to the container.
 
@@ -91,6 +98,7 @@ builder.Services
     .AddTransient<ILocationService, LocationService>()
     .AddTransient<IReservationService, ReservationService>()
     .AddTransient<ICategoryService, CategoryService>()
+    .AddTransient<ILocationImagesService, LocationImagesService>()
     .AddTransient<IIdentityAuthorizationConfigProvider, IdentityAuthorizationConfigProvider>()
     .AddTransient(typeof(ICodeProvider<>), typeof(CodeProvider<>));
 

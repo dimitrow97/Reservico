@@ -34,6 +34,7 @@ import { apiSlice } from "../../app/api/api-slice"
 import { useDispatch, useSelector } from "react-redux"
 import { selectCurrentClient } from "../../features/auth/auth-slice"
 import { useGetCategoriesQuery } from "../../features/categories/categories-api-slice"
+import Loader from "../common/loader"
 
 export function LocationAddDrawer() {
     const [loading, setLoading] = useState(false)
@@ -120,7 +121,7 @@ export function LocationAddDrawer() {
 
     let content;
     if (isLoading) {
-        content = <p>"Loading..."</p>;
+        content = <Loader />;
     } else if (isSuccess) {
         content = (
             <Drawer open={open} onOpenChange={setOpen}>

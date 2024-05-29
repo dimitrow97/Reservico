@@ -39,6 +39,7 @@ import { useGetClientsQuery } from "../../features/clients/clients-api-slice"
 import { UserAddSchema } from "../../schema";
 import { apiSlice } from "../../app/api/api-slice"
 import { useDispatch } from "react-redux"
+import Loader from "../common/loader"
 
 export function UserAddDrawer() {
     const {
@@ -105,7 +106,7 @@ export function UserAddDrawer() {
 
     let content;
     if (isLoading) {
-        content = <p>"Loading..."</p>;
+        content = <Loader />;
     } else if (isSuccess) {
         content = (
             <Drawer open={open} onOpenChange={setOpen}>
