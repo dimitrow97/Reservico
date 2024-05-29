@@ -362,4 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Reservico.Api/appsettings.Development.json
-.terraform/
+/reservico-terraform-cloud/terraform/.terraform/
