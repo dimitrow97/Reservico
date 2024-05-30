@@ -45,7 +45,8 @@ export const apiSlice = createApi({
         "client", 
         "client-users", 
         "category", 
-        "users"
+        "users",
+        "dashboard"
     ],
     endpoints: builder => ({})
 })

@@ -262,6 +262,71 @@ namespace Reservico.Services.Reservations
             return ServiceResponse.Success();
         }
 
+        public async Task<ServiceResponse<ReservationsReportViewModel>> GetReservationsReport(
+            Guid? clientId)
+        {
+            var reservations = this.reservationRepository
+                .Query()
+                .Include(x => x.Table)
+                    .ThenInclude(x => x.Location)
+                .Where(x => !x.IsDeleted);
+
+            if (clientId.HasValue)
+            {
+                reservations = reservations
+                    .Where(x => x.Table.Location.ClientId.Equals(clientId.Value));
+            }
+
+            var totalNumberOfReservations = reservations.Count();
+            var totalNumberOfReservationsLastMonth = reservations
+                .Where(x => x.CreatedOn <= DateTime.UtcNow.AddMonths(-1))
+                .Count();
+            var totalNumberOfConfirmedReservations = reservations
+                .Where(x => x.IsConfirmed)
+                .Count();
+            var totalNumberOfConfirmedReservationsLastMonth = reservations
+                .Where(x => x.CreatedOn <= DateTime.UtcNow.AddMonths(-1))
+                .Where(x => x.IsConfirmed)
+                .Count();
+
+            var lastFiveReservations = await reservations
+                .OrderByDescending(x => x.CreatedOn)
+                .Take(5)
+                .Select(reservation => new ReservationViewModel
+                {
+                    Id = reservation.Id,
+                    GuestsArrivingAt = reservation.GuestsArrivingAt,
+                    FirstName = reservation.FirstName,
+                    LastName = reservation.LastName,
+                    Email = reservation.Email,
+                    PhoneNumber = reservation.PhoneNumber,
+                    IsConfirmed = reservation.IsConfirmed,
+                    Note = reservation.Note,
+                    NumberOfGuests = reservation.NumberOfGuests,
+                    IsDeleted = reservation.IsDeleted,
+                    LocationId = reservation.Table.LocationId,
+                    LocationName = reservation.Table.Location.Name,
+                    TableId = reservation.TableId,
+                    TableName = reservation.Table.Name
+                })
+                .ToListAsync();
+
+            var result = new ReservationsReportViewModel
+            {
+                TotalNumberOfReservations = totalNumberOfReservations,
+                TotalNumberOfConfirmedReservations = totalNumberOfConfirmedReservations,
+                PercentMoreReservations = this.CalculatePercentageChange((double)totalNumberOfReservations, (double)totalNumberOfReservationsLastMonth),
+                PercentMoreConfirmedReservations = this.CalculatePercentageChange((double)totalNumberOfConfirmedReservations, (double)totalNumberOfConfirmedReservationsLastMonth),                
+                LastFiveReservations = lastFiveReservations
+            };
+
+            return ServiceResponse<ReservationsReportViewModel>.Success(result);
+        }
+
+        private double CalculatePercentageChange(
+            double final, double initial)
+            => Math.Round(100 * ((final - initial) / Math.Abs(initial == 0 ? 1 : initial)), 3);
+
         private async Task<ServiceResponse> CheckIfTableAlreadyTaken(
             Reservation reservation)
         {

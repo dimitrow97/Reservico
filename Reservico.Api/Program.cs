@@ -23,6 +23,7 @@ using Reservico.Services.Categories;
 using Azure.Storage.Blobs;
 using Reservico.Services.LocationImages.Models;
 using Reservico.Services.LocationImages;
+using Reservico.Services.Dashboard;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("reservicoDbConnection")
@@ -99,6 +100,7 @@ builder.Services
     .AddTransient<IReservationService, ReservationService>()
     .AddTransient<ICategoryService, CategoryService>()
     .AddTransient<ILocationImagesService, LocationImagesService>()
+    .AddTransient<IDashboardService, DashboardService>()
     .AddTransient<IIdentityAuthorizationConfigProvider, IdentityAuthorizationConfigProvider>()
     .AddTransient(typeof(ICodeProvider<>), typeof(CodeProvider<>));
 

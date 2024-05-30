@@ -18,7 +18,7 @@ export const locationsApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: { ...requestModel }
             }),
-            invalidatesTags: ["locations"] 
+            invalidatesTags: ["locations", "dashboard"] 
         }),  
         deleteLocation: builder.mutation({
             query: params => ({
@@ -26,7 +26,7 @@ export const locationsApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
                 params: { ...params }
             }),
-            invalidatesTags: ["locations"] 
+            invalidatesTags: ["locations", "dashboard"] 
         }),  
         updateLocation: builder.mutation({
             query: requestModel => ({

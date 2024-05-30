@@ -19,5 +19,8 @@ namespace Reservico.Services.Reservations
         Task<ServiceResponse> Confirm(Guid reservationId);
 
         Task<ServiceResponse> Cancel(Guid reservationId);
+
+        Task<ServiceResponse<ReservationsReportViewModel>> GetReservationsReport(
+            Guid? clientId);
     }
 }

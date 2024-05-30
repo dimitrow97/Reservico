@@ -18,7 +18,7 @@ export const reservationsApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 params: { ...params }
             }),
-            invalidatesTags: ["reservations"] 
+            invalidatesTags: ["reservations", "dashboard"] 
         }),       
     })
 })
