@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Reservico.Common.Models;
+﻿using Reservico.Common.Models;
 using Reservico.Services.LocationImages.Models;
 
 namespace Reservico.Services.LocationImages

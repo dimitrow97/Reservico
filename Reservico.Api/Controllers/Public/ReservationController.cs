@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Reservico.Common.Models;
 using Reservico.Services.Reservations;
 using Reservico.Services.Reservations.Models;
 
 namespace Reservico.Api.Controllers.Public
 {
-    [ApiController]
-    [Route("[controller]")]
-    [ApiExplorerSettings(GroupName = "Public Endpoints")]
-    public class ReservationController : ControllerBase
+    public class ReservationController : BasePublicController
     {
         private readonly IReservationService reservationService;
         private readonly ILogger<ReservationController> logger;
@@ -42,6 +40,31 @@ namespace Reservico.Api.Controllers.Public
                 }
 
                 return this.Ok(response);
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("{reservationId}")]
+        [ProducesResponseType(typeof(ServiceResponse<ReservationViewModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Get(Guid reservationId)
+        {
+            try
+            {
+                var response = await this.reservationService.Get(reservationId);
+
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response);
+                }
+
+                return Ok(response);
 
             }
             catch (Exception ex)

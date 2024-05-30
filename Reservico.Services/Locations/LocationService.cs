@@ -3,10 +3,15 @@ using Microsoft.EntityFrameworkCore;
 using Reservico.Common.Models;
 using Reservico.Data.Entities;
 using Reservico.Data.Interfaces;
+using Reservico.Identity.UserManager.Models;
+using Reservico.Identity.UserManager;
 using Reservico.Services.Categories;
 using Reservico.Services.Clients;
 using Reservico.Services.Locations.Models;
 using Reservico.Services.Reservations.Models;
+using System.Text.RegularExpressions;
+using System.Linq.Dynamic.Core;
+using Reservico.Services.LocationImages.Models;
 
 namespace Reservico.Services.Locations
 {
@@ -105,6 +110,7 @@ namespace Reservico.Services.Locations
         {
             var location = await this.locationRepository.Query()
                 .Include(x => x.Client)
+                .Include(x => x.Tables)
                 .Include(x => x.LocationCategories)
                     .ThenInclude(x => x.Category)
                 .FirstOrDefaultAsync(x => x.Id.Equals(locationId) && !x.IsDeleted);
@@ -116,6 +122,9 @@ namespace Reservico.Services.Locations
             }
 
             var result = this.mapper.Map(location, new LocationDetailsViewModel());
+
+            result.WorkingHoursFrom = location.Tables.Min(x => x.WorkingHoursFrom);
+            result.WorkingHoursTo = location.Tables.Max(x => x.WorkingHoursFrom);
 
             return ServiceResponse<LocationDetailsViewModel>.Success(result);
         }
@@ -325,6 +334,90 @@ namespace Reservico.Services.Locations
             await this.tableRepository.UpdateAsync(table);
 
             return ServiceResponse.Success();
+        }
+
+        public async Task<ServiceResponse<ListViewModel<LocationDetailsViewModel>>> Filter(
+            string filter = null,
+            int skip = 0,
+            int take = 9)
+        {
+            var queryable = this.locationRepository.Query()
+                .Include(x => x.Tables)
+                .Include(x => x.Client)
+                .Include(x => x.LocationImages)
+                .Include(x => x.LocationCategories)
+                    .ThenInclude(x => x.Category)
+                .Where(x => !x.IsDeleted);
+
+            var result = await this.GetInner(queryable, filter, skip, take);
+
+            if (!result.IsSuccess)
+            {
+                return ServiceResponse<ListViewModel<LocationDetailsViewModel>>
+                    .Error(result.ErrorMessage);
+            }
+
+            return result;
+        }
+
+        private async Task<ServiceResponse<ListViewModel<LocationDetailsViewModel>>> GetInner(
+            IQueryable<Location> queryable,
+            string filter = null,
+            int skip = 0,
+            int take = 10)
+        {
+            //filtering
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                filter = RenameQueryFields(filter);
+
+                queryable = queryable.Where(filter);
+            }
+
+            var totalCount = await queryable.CountAsync();
+
+            //paging
+            queryable = queryable.Skip(skip).Take(take);
+
+            var locations = await queryable
+                .ToListAsync();
+
+            var result = locations.Select(location => mapper.Map(location, new LocationDetailsViewModel
+            {
+                LocationImages = location.LocationImages.Select(x => new LocationImageViewModel
+                {
+                    LocationImageId = x.Id,
+                    BlobPath = x.BlobPath
+                })
+            }));
+
+            return ServiceResponse<ListViewModel<LocationDetailsViewModel>>.Success(
+                new ListViewModel<LocationDetailsViewModel>
+                {
+                    TotalCount = totalCount,
+                    Data = result
+                });
+        }
+
+        private string RenameQueryFields(string query)
+        {
+            var result = query.ToLower()
+               .Replace("postcode", "Postcode")
+               .Replace("city", "City")
+               .Replace("country", "Country")
+               .Replace("name", "Name");
+
+            var rgx = new Regex("category.contains\\((.+)\\)");
+
+            if (rgx.IsMatch(result))
+            {
+                var match = rgx.Match(result);
+                match.Groups.TryGetValue("1", out var categoryNameFilter);
+
+                result = rgx.Replace(result, $"LocationCategories.Any(y => y.Category.Name.Contains({categoryNameFilter.Value}))");
+            }
+
+            return result;
         }
 
         private async Task HandleCategoriesOnUpdate(

@@ -333,7 +333,6 @@ namespace Reservico.Services.Reservations
             var isTableAlreadyTaken = await this.reservationRepository
                 .Query()
                 .Include(x => x.Table)
-                .OrderBy(x => x.Table.Capacity)
                 .Where(x => x.IsConfirmed && !x.IsDeleted)
                 .Where(x => x.TableId.Equals(reservation.TableId))
                 .Where(x => x.GuestsArrivingAt.Equals(reservation.GuestsArrivingAt) ||
@@ -382,6 +381,7 @@ namespace Reservico.Services.Reservations
                                 y.GuestsArrivingAt.AddHours((x.TableTurnOffset * -1)) >= desiredTime))
                      ))
                 .OrderBy(x => x.Reservations.Count)
+                    .ThenBy(x => x.Capacity)
                 .FirstOrDefault();
 
             if (table is null)
