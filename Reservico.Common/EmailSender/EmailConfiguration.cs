@@ -13,5 +13,7 @@
         public string EmailFromAddress { get; set; }
 
         public string ApplicationUrl { get; set; }
+
+        public string PublicApplicationUrl { get; set; }
     }
 }

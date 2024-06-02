@@ -2,29 +2,41 @@ import { apiSlice } from "../../app/api/api-slice"
 
 export const reservationsApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
-        getReservations: builder.query({
-            query: clientId => '/Reservation/GetAll?clientId=' + clientId,
-            keepUnusedDataFor: 1,
-            providesTags: ["reservations"]
-        }),
         getReservationDetails: builder.query({
             query: reservationId => '/Reservation/' + reservationId,
             keepUnusedDataFor: 1,            
             providesTags: ["reservations"]
         }),    
-        confirmReservation: builder.mutation({
-            query: params => ({
-                url: '/Reservation/Confirm',
+        makeReservation: builder.mutation({
+            query: body => ({
+                url: '/Public/Reservation',
                 method: 'POST',
+                body: { ...body }
+            }),
+            invalidatesTags: ["reservations"] 
+        }),       
+        cancelReservation: builder.mutation({
+            query: params => ({
+                url: '/Public/Reservation',
+                method: 'PUT',
                 params: { ...params }
             }),
-            invalidatesTags: ["reservations", "dashboard"] 
+            invalidatesTags: ["reservations"] 
+        }),       
+        cancellationReservation: builder.mutation({
+            query: body => ({
+                url: '/Public/Reservation/Cancellation',
+                method: 'POST',
+                params: { ...body }
+            }),
+            invalidatesTags: ["reservations"] 
         }),       
     })
 })
 
 export const {
-    useGetReservationsQuery,
     useGetReservationDetailsQuery,
-    useConfirmReservationMutation    
+    useMakeReservationMutation,
+    useCancelReservationMutation,
+    useCancellationReservationMutation 
 } = reservationsApiSlice 

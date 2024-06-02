@@ -12,6 +12,7 @@ import ReservationDetails from './pages/reservation-details'
 import Categories from './pages/categories'
 import RequireAuth from './features/auth/require-auth'
 import './App.css'
+import NotFound from './pages/not-found'
 
 function App() {
 
@@ -22,8 +23,8 @@ function App() {
 
       {/* protected routes */}
       <Route element={<RequireAuth allowedRoles={ ["Admin"] }/>}>
-        <Route path="/" element={<Layout />}>
-          <Route path="home" element={<Home />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
           <Route path="clients" element={<Clients />} />
           <Route path="client-details" element={<ClientDetails />} />
           <Route path="account-profile" element={<AccountProfile />} />
@@ -32,6 +33,7 @@ function App() {
           <Route path="reservations" element={<Reservations />} />
           <Route path="reservation-details" element={<ReservationDetails />} />
           <Route path="categories" element={<Categories />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
     </Routes>

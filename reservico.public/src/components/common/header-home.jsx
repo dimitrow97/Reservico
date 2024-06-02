@@ -7,7 +7,7 @@ const HeaderHome = () => {
                 <a href="/" className="text-white">                    
                     <div className="flex flex-row gap-1 pl-2">
                         <img src="/logo-home.svg" className="fill-white" />
-                        <span className="text-xl">Reservico</span>
+                        <span className="text-3xl drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">Reservico</span>
                     </div>
                 </a>
             </div>

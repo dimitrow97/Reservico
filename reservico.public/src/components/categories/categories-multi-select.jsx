@@ -16,7 +16,7 @@ const CategoriesMultiSelect = ({ categories, selected, setSelected }) => {
   const [inputValue, setInputValue] = React.useState("");
 
   const handleUnselect = React.useCallback((category) => {
-    setSelected((prev) => prev.filter((s) => s.categoryId !== category.categoryId));
+    setSelected((prev) => prev.filter((s) => s.name !== category.name));
   }, []);
 
   const handleKeyDown = React.useCallback(
@@ -42,7 +42,7 @@ const CategoriesMultiSelect = ({ categories, selected, setSelected }) => {
   );
 
   const selectables = categories.filter(
-    (category) => !selected.some((s) => s.categoryId === category.categoryId)
+    (category) => !selected.some((s) => s.name === category.name)
   );
 
   return (

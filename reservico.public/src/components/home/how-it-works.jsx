@@ -9,13 +9,12 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import Image from "../ui/image"
 import { Separator } from "@/components/ui/separator"
 
 const HowItWorks = () => {
     return (
-        <div className="h-[630px] overflow-hidden">
-            <div className="absolute p-4 items-center justify-center">
+        <div className="h-auto xl:h-[630px] bg-[url('/background.jpeg')] bg-center bg-cover overflow-hidden">
+            <div className="p-4 items-center justify-center">
                 <div className="w-full rounded-lg p-4 text-white flex flex-col items-center justify-center">
                     <span className="text-4xl font-bold pb-2 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
                         How it works?
@@ -71,7 +70,6 @@ const HowItWorks = () => {
                     </a>
                 </div>
             </div>
-            <Image src="/background.jpeg" alt="Image" className="object-fill" />
         </div>
     )
 }

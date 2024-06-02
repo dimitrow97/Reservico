@@ -10,6 +10,7 @@ import Reservations from './pages/reservations'
 import ReservationDetails from './pages/reservation-details'
 import RequireAuth from './features/auth/require-auth'
 import './App.css'
+import NotFound from './pages/not-found'
 
 function App() {
 
@@ -20,14 +21,15 @@ function App() {
 
       {/* protected routes */}
       <Route element={<RequireAuth allowedRoles={ ["Read-Write_User"] } />}>
-        <Route path="/" element={<Layout />}>
-          <Route path="home" element={<Home />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
           <Route path="account-profile" element={<AccountProfile />} />
           <Route path="locations" element={<Locations />} />
           <Route path="location-details" element={<LocationDetails />} />
           <Route path="table-details" element={<TableDetails />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="reservation-details" element={<ReservationDetails />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Route>
     </Routes>

@@ -73,6 +73,32 @@ namespace Reservico.Api.Controllers.Public
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
+        
+        [HttpPost("Cancellation")]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SendCancellation(Guid reservationId)
+        {
+            try
+            {
+                var response = await this.reservationService
+                    .SendCancellationEmail(reservationId);
+
+                if (!response.IsSuccess)
+                {
+                    return this.BadRequest(response);
+                }
+
+                return this.Ok(response);
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
 
         /// <summary>
         /// Cancel a Reservation for the desired Location.

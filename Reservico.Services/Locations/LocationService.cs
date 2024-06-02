@@ -124,7 +124,7 @@ namespace Reservico.Services.Locations
             var result = this.mapper.Map(location, new LocationDetailsViewModel());
 
             result.WorkingHoursFrom = location.Tables.Min(x => x.WorkingHoursFrom);
-            result.WorkingHoursTo = location.Tables.Max(x => x.WorkingHoursFrom);
+            result.WorkingHoursTo = location.Tables.Max(x => x.WorkingHoursTo);
 
             return ServiceResponse<LocationDetailsViewModel>.Success(result);
         }
@@ -384,7 +384,9 @@ namespace Reservico.Services.Locations
 
             var result = locations.Select(location => mapper.Map(location, new LocationDetailsViewModel
             {
-                LocationImages = location.LocationImages.Select(x => new LocationImageViewModel
+                WorkingHoursFrom = location.Tables.Min(x => x.WorkingHoursFrom),
+                WorkingHoursTo = location.Tables.Max(x => x.WorkingHoursTo),
+                LocationImages = location.LocationImages.Where(x => !x.IsDeleted).Select(x => new LocationImageViewModel
                 {
                     LocationImageId = x.Id,
                     BlobPath = x.BlobPath
@@ -395,6 +397,7 @@ namespace Reservico.Services.Locations
                 new ListViewModel<LocationDetailsViewModel>
                 {
                     TotalCount = totalCount,
+                    NumberOfPages = totalCount > take ? (int)Math.Ceiling((double)totalCount / take) : 1,
                     Data = result
                 });
         }

@@ -14,7 +14,8 @@
             string reservationEmail,
             DateTime guestsArrivingAt,
             int numberOfGuests,
-            string locationName);
+            string locationName,
+            Guid reservationId);
 
         Task ReservationEmailToLocation(
             string locationEmail,
@@ -27,6 +28,13 @@
             DateTime guestsArrivingAt,
             int numberOfGuests,
             string locationName);
+
+        Task ReservationCancellationEmail(
+            string reservationEmail,
+            DateTime guestsArrivingAt,
+            int numberOfGuests,
+            string locationName,
+            Guid reservationId);
 
         Task ReservationCancelledEmail(
             string reservationEmail,

@@ -104,8 +104,10 @@ namespace Reservico.Services.Reservations
                 IsDeleted = reservation.IsDeleted,
                 LocationId = reservation.Table.LocationId,
                 LocationName = reservation.Table.Location.Name,
+                LocationEmail = reservation.Table.Location.Email,
                 TableId = reservation.TableId,
-                TableName = reservation.Table.Name
+                TableName = reservation.Table.Name,
+                CanBeCancelled = reservation.GuestsArrivingAt > DateTime.UtcNow && !reservation.IsConfirmed && !reservation.IsDeleted
             };
 
             return ServiceResponse<ReservationViewModel>
@@ -157,7 +159,8 @@ namespace Reservico.Services.Reservations
                 reservation.Email,
                 reservation.GuestsArrivingAt,
                 reservation.NumberOfGuests,
-                location.Data.Name);
+                location.Data.Name,
+                reservation.Id);
 
             await this.emailSender.ReservationEmailToLocation(
                 location.Data.Email,
@@ -215,6 +218,38 @@ namespace Reservico.Services.Reservations
                 reservation.GuestsArrivingAt,
                 reservation.NumberOfGuests,
                 reservation.Table.Location.Name);
+
+            return ServiceResponse.Success();
+        }
+
+        public async Task<ServiceResponse> SendCancellationEmail(Guid reservationId)
+        {
+            var reservationExists = await this.ReservationExists(reservationId);
+
+            if (!reservationExists.IsSuccess)
+            {
+                return ServiceResponse.Error(
+                    reservationExists.ErrorMessage);
+            }
+
+            var reservation = await this.reservationRepository
+                .Query()
+                .Include(x => x.Table)
+                    .ThenInclude(x => x.Location)
+                .FirstOrDefaultAsync(x => x.Id.Equals(reservationId));
+
+            if (reservation.IsConfirmed)
+            {
+                return ServiceResponse.Error(
+                    "Reservation is already confirmed. Please contact the establishment and try to cancel.");
+            }
+
+            await this.emailSender.ReservationCancellationEmail(
+               reservation.Email,
+               reservation.GuestsArrivingAt,
+               reservation.NumberOfGuests,
+               reservation.Table.Location.Name,
+               reservation.Id);
 
             return ServiceResponse.Success();
         }
@@ -335,7 +370,7 @@ namespace Reservico.Services.Reservations
                 .Include(x => x.Table)
                 .Where(x => x.IsConfirmed && !x.IsDeleted)
                 .Where(x => x.TableId.Equals(reservation.TableId))
-                .Where(x => x.GuestsArrivingAt.Equals(reservation.GuestsArrivingAt) ||
+                .Where(x => x.GuestsArrivingAt.Hour.Equals(reservation.GuestsArrivingAt.Hour) ||
                     (x.GuestsArrivingAt.Date.Equals(reservation.GuestsArrivingAt.Date) &&
                         (x.GuestsArrivingAt.AddHours(x.Table.TableTurnOffset) <= reservation.GuestsArrivingAt ||
                          x.GuestsArrivingAt.AddHours((x.Table.TableTurnOffset * -1)) >= reservation.GuestsArrivingAt)))
@@ -371,14 +406,14 @@ namespace Reservico.Services.Reservations
                     (!x.CanTableTurn &&
                         x.Reservations.Any(y => y.GuestsArrivingAt.Date.Equals(desiredTime.Date) && !y.IsConfirmed)) ||
                     (x.CanTableTurn &&
-                        x.Reservations.Any(y => (!y.IsConfirmed &&
-                            (y.GuestsArrivingAt.Date.Equals(desiredTime.Date) ||
-                            (y.GuestsArrivingAt.Equals(desiredTime))))
+                        (!x.Reservations.Any(y => (y.IsConfirmed &&
+                            (y.GuestsArrivingAt.Date.Equals(desiredTime.Date) &&
+                            (y.GuestsArrivingAt.Hour.Equals(desiredTime.Hour))))
                         ) ||
                         x.Reservations.Any(y => y.IsConfirmed &&
                             y.GuestsArrivingAt.Date.Equals(desiredTime.Date) &&
                                 (y.GuestsArrivingAt.AddHours(x.TableTurnOffset) <= desiredTime ||
-                                y.GuestsArrivingAt.AddHours((x.TableTurnOffset * -1)) >= desiredTime))
+                                y.GuestsArrivingAt.AddHours((x.TableTurnOffset * -1)) >= desiredTime)))
                      ))
                 .OrderBy(x => x.Reservations.Count)
                     .ThenBy(x => x.Capacity)

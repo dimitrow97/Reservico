@@ -3,7 +3,7 @@ import { apiSlice } from "../../app/api/api-slice"
 export const categoriesApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getCategories: builder.query({
-            query: () => '/Category',
+            query: () => '/Public/Category',
             keepUnusedDataFor: 1,
             providesTags: ["category"]
         })        

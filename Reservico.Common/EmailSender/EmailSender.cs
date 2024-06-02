@@ -52,13 +52,14 @@ namespace Reservico.Common.EmailSender
             string reservationEmail,
             DateTime guestsArrivingAt,
             int numberOfGuests,
-            string locationName)
+            string locationName,
+            Guid reservationId)
         {
             var emailFromAddress = this.GetEmailFromAddress();
 
             var message = new MailMessage(emailFromAddress, reservationEmail)
             {
-                Body = $"<p>A Reservation in your name has been placed through Reservico</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>",
+                Body = $"<p>A Reservation in your name has been placed through Reservico</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>\r\n<p>Click <strong><a href=\"{this.GetPublicAppUrl()}/reservation-details/{reservationId}\">here</a></strong> to view the Reservation.</p>",
                 Subject = "Reservico Reservation",
                 IsBodyHtml = true
             };
@@ -84,6 +85,25 @@ namespace Reservico.Common.EmailSender
             await this.SendMailAsync(message);
         }
 
+        public async Task ReservationCancellationEmail(
+            string reservationEmail,
+            DateTime guestsArrivingAt,
+            int numberOfGuests,
+            string locationName,
+            Guid reservationId)
+        {
+            var emailFromAddress = this.GetEmailFromAddress();
+
+            var message = new MailMessage(emailFromAddress, reservationEmail)
+            {
+                Body = $"<p>Want to cancel your Reservation from Reservico?</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>\r\n<p>Click <strong><a href=\"{this.GetPublicAppUrl()}/reservation/cancel/{reservationId}\">here</a></strong> to cancel.</p>",
+                Subject = "Reservico Reservation Cancellation",
+                IsBodyHtml = true
+            };
+
+            await this.SendMailAsync(message);
+        }
+
         public async Task ReservationCancelledEmail(
             string reservationEmail,
             DateTime guestsArrivingAt,
@@ -95,7 +115,7 @@ namespace Reservico.Common.EmailSender
             var message = new MailMessage(emailFromAddress, reservationEmail)
             {
                 Body = $"<p>You have Cancelled your Reservation from Reservico</p>\r\n<p>Location: {locationName}</p>\r\n<p>Number of Guests: {numberOfGuests}</p>\r\n<p>Guests will be arriving at: {guestsArrivingAt}</p>",
-                Subject = "Reservico Reservation Cancellation",
+                Subject = "Reservico Reservation Cancellation Confirmation",
                 IsBodyHtml = true
             };
 
@@ -156,6 +176,9 @@ namespace Reservico.Common.EmailSender
             => this.configuration.EmailFromAddress;
 
         private string GetAppUrl()        
-            => this.configuration.ApplicationUrl;        
+            => this.configuration.ApplicationUrl;
+
+        private string GetPublicAppUrl()
+            => this.configuration.PublicApplicationUrl;
     }
 }

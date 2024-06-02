@@ -4,7 +4,7 @@ import { Label } from "../ui/label";
 import Loader from "../common/loader";
 import ReservationConfirmAlertDialog from "./reservation-confirm-alert-dialog"
 
-const ClientDetailsForm = (props) => {
+const ReservationDetailsForm = (props) => {
     const {
         data,
         error,
@@ -153,4 +153,4 @@ const ClientDetailsForm = (props) => {
     return content
 }
 
-export default ClientDetailsForm
+export default ReservationDetailsForm
