@@ -23,10 +23,10 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Integration
+        run: dotnet build --configuration Debug
 
       - name: dotnet publish
-        run: dotnet publish -c Integration -o ${{env.DOTNET_ROOT}}/Reservico.Api
+        run: dotnet publish -c Debug -o ${{env.DOTNET_ROOT}}/Reservico.Api
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
