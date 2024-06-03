@@ -165,7 +165,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-app.MapGet("/", () => Results.Ok(connectionString));
+app.MapGet("/", () => Results.Ok());
 
 // Configure the HTTP request pipeline.
 // if (builder.Configuration.GetValue<bool>("IsLocal"))
