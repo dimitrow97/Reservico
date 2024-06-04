@@ -123,8 +123,8 @@ namespace Reservico.Services.Locations
 
             var result = this.mapper.Map(location, new LocationDetailsViewModel());
 
-            result.WorkingHoursFrom = location.Tables.Min(x => x.WorkingHoursFrom);
-            result.WorkingHoursTo = location.Tables.Max(x => x.WorkingHoursTo);
+            result.WorkingHoursFrom = location.Tables?.Min(x => x.WorkingHoursFrom) ?? 10;
+            result.WorkingHoursTo = location.Tables?.Max(x => x.WorkingHoursTo) ?? 23;
 
             return ServiceResponse<LocationDetailsViewModel>.Success(result);
         }
