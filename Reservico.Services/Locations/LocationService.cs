@@ -387,8 +387,8 @@ namespace Reservico.Services.Locations
 
             var result = locations.Select(location => mapper.Map(location, new LocationDetailsViewModel
             {
-                WorkingHoursFrom = location.Tables.Min(x => x.WorkingHoursFrom),
-                WorkingHoursTo = location.Tables.Max(x => x.WorkingHoursTo),
+                WorkingHoursFrom = location.Tables.Any() ? location.Tables.Min(x => x.WorkingHoursFrom) : 10,
+                WorkingHoursTo = location.Tables.Any() ? location.Tables.Max(x => x.WorkingHoursTo) : 23,
                 LocationImages = location.LocationImages.Where(x => !x.IsDeleted).Select(x => new LocationImageViewModel
                 {
                     LocationImageId = x.Id,
