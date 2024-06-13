@@ -12,6 +12,7 @@ using Reservico.Services.Reservations.Models;
 using System.Text.RegularExpressions;
 using System.Linq.Dynamic.Core;
 using Reservico.Services.LocationImages.Models;
+using System.Collections.Immutable;
 
 namespace Reservico.Services.Locations
 {
@@ -413,14 +414,18 @@ namespace Reservico.Services.Locations
                .Replace("country", "Country")
                .Replace("name", "Name");
 
-            var rgx = new Regex("category.contains\\((.+)\\)");
-
+            var rgx = new Regex("category\\.contains\\((\"[^\"]+\")\\)");
+            
             if (rgx.IsMatch(result))
             {
-                var match = rgx.Match(result);
-                match.Groups.TryGetValue("1", out var categoryNameFilter);
+                var matches = rgx.Matches(result);
 
-                result = rgx.Replace(result, $"LocationCategories.Any(y => y.Category.Name.Contains({categoryNameFilter.Value}))");
+                foreach (var match in matches.ToImmutableList())
+                {
+                    match.Groups.TryGetValue("1", out var categoryNameFilter);
+
+                    result = rgx.Replace(result, $"LocationCategories.Any(y => y.Category.Name.ToLower().Contains({categoryNameFilter.Value}))", 1);
+                }                
             }
 
             return result;
